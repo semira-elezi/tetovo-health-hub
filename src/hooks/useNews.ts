@@ -12,7 +12,7 @@ export function useNews(category?: string) {
         .order("published_at", { ascending: false });
 
       if (category && category !== "All") {
-        query = query.eq("category", category);
+        query = query.eq("category", category as any);
       }
 
       const { data, error } = await query;

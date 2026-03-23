@@ -12,7 +12,7 @@ export function useDepartments(category?: string) {
         .order("name_en");
 
       if (category && category !== "All") {
-        query = query.eq("category", category);
+        query = query.eq("category", category as any);
       }
 
       const { data, error } = await query;

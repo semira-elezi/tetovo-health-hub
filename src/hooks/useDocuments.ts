@@ -15,7 +15,7 @@ export function useDocuments(category?: string) {
         .order("created_at", { ascending: false });
 
       if (category) {
-        query = query.eq("category", category);
+        query = query.eq("category", category as any);
       }
 
       const { data, error } = await query;

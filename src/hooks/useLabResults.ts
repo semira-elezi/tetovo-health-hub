@@ -15,7 +15,7 @@ export function useLabResults(status?: string) {
         .order("created_at", { ascending: false });
 
       if (status) {
-        query = query.eq("status", status);
+        query = query.eq("status", status as any);
       }
 
       const { data, error } = await query;
