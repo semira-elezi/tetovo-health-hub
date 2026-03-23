@@ -1,163 +1,241 @@
 import { Link } from "react-router-dom";
 import {
   Heart, AlertTriangle, Scissors, Brain, Baby, Users,
-  Clock, Activity, FlaskConical, Stethoscope, ArrowRight,
-  Phone, Shield, Award,
+  ArrowRight, CheckCircle2, FileText, ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useTranslation } from "@/lib/i18n";
 import Layout from "@/components/layout/Layout";
-import heroImg from "@/assets/hero-hospital.jpg";
-import medicalBg from "@/assets/medical-pattern.jpg";
+import { useEffect, useRef, useState } from "react";
 
+/* ─── Counter animation hook ─── */
+function useCountUp(target: number, duration = 1500) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started.current) {
+          started.current = true;
+          const start = performance.now();
+          const animate = (now: number) => {
+            const progress = Math.min((now - start) / duration, 1);
+            setCount(Math.floor(progress * target));
+            if (progress < 1) requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [target, duration]);
+
+  return { count, ref };
+}
+
+/* ─── Stagger animation hook ─── */
+function useStaggerIn() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { threshold: 0.1 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return { ref, visible };
+}
+
+/* ─── Data ─── */
 const departments = [
-  { key: "cardiology", icon: Heart, slug: "cardiology" },
-  { key: "emergency", icon: AlertTriangle, slug: "emergency" },
-  { key: "surgery", icon: Scissors, slug: "surgery" },
-  { key: "neurology", icon: Brain, slug: "neurology" },
-  { key: "pediatrics", icon: Baby, slug: "pediatrics" },
-  { key: "gynecology", icon: Users, slug: "gynecology" },
-] as const;
+  { name: "Cardiology", desc: "Diagnosis and treatment of heart and vascular diseases.", icon: Heart, slug: "cardiology" },
+  { name: "Emergency Medicine", desc: "24/7 emergency and acute care services.", icon: AlertTriangle, slug: "emergency-medicine" },
+  { name: "General Surgery", desc: "Surgical treatment of injuries and trauma.", icon: Scissors, slug: "general-surgery" },
+  { name: "Neurology", desc: "Diagnosis and treatment of neurological diseases.", icon: Brain, slug: "neurology" },
+  { name: "Gynecology & Obstetrics", desc: "Women's health, pregnancy, and childbirth.", icon: Baby, slug: "gynecology" },
+  { name: "Pediatrics", desc: "Pediatric medicine and child healthcare.", icon: Users, slug: "pediatrics" },
+];
 
-const waitTimes = [
-  { key: "er.emergency", time: 15, status: "green" },
-  { key: "er.outpatient", time: 35, status: "yellow" },
-  { key: "er.lab", time: 20, status: "green" },
-] as const;
-
-const news = [
+const newsItems = [
   {
-    date: "2026-03-20",
-    title: { mk: "Нов MRI апарат во болницата", sq: "Aparat i ri MRI në spital", en: "New MRI Machine Installed" },
-    excerpt: {
-      mk: "Современ апарат за магнетна резонанца почна со работа",
-      sq: "Aparat modern i rezonancës magnetike filloi punën",
-      en: "A state-of-the-art MRI machine has begun operations",
-    },
+    slug: "new-medical-equipment",
+    title: "New Medical Equipment for the Oncology Department",
+    date: "March 10, 2025",
+    category: "Hospital News",
+    excerpt: "The hospital has received new state-of-the-art equipment for the application of cytostatic therapy, significantly improving treatment capabilities.",
+    image: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?w=600&q=80",
   },
   {
-    date: "2026-03-15",
-    title: { mk: "Бесплатни прегледи за деца", sq: "Kontrolle falas për fëmijë", en: "Free Pediatric Checkups" },
-    excerpt: {
-      mk: "Кампања за бесплатни педијатриски прегледи до крајот на месецот",
-      sq: "Fushatë për kontrolle falas pediatrike deri në fund të muajit",
-      en: "Free pediatric checkup campaign running through month end",
-    },
+    slug: "health-screening-campaign",
+    title: "Annual Health Screening Campaign Launches This Spring",
+    date: "February 22, 2025",
+    category: "Health Tips",
+    excerpt: "Free preventive examinations will be available to citizens of the Tetovo region throughout April and May as part of our community health initiative.",
+    image: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&q=80",
   },
   {
-    date: "2026-03-10",
-    title: { mk: "Меѓународна конференција", sq: "Konferencë ndërkombëtare", en: "International Conference" },
-    excerpt: {
-      mk: "Болницата ќе биде домаќин на меѓународна медицинска конференција",
-      sq: "Spitali do të jetë nikoqir i konferencës ndërkombëtare mjekësore",
-      en: "The hospital will host an international medical conference",
-    },
+    slug: "50-years",
+    title: "Clinical Hospital Tetovo Celebrates 50 Years of Service",
+    date: "January 15, 2025",
+    category: "Events",
+    excerpt: "This year marks five decades of dedicated medical service to the communities of northwestern North Macedonia.",
+    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80",
   },
 ];
 
-const statusColor: Record<string, string> = {
-  green: "bg-success text-success-foreground",
-  yellow: "bg-warning text-warning-foreground",
-  red: "bg-destructive text-destructive-foreground",
-};
+const publicInfoItems = [
+  "Documents", "Budget", "Quarterly Reports", "Annual Financial Reports",
+  "Internal Job Listings", "Annual Procurement Plan", "Procurement Announcements", "Patient Rights & Obligations",
+];
 
+const partners = [
+  { name: "Ministry of Health", url: "http://zdravstvo.gov.mk/" },
+  { name: "Health Insurance Fund", url: "https://fzo.org.mk/" },
+  { name: "Moj Termin", url: "http://zdravstvo.gov.mk/" },
+  { name: "Medical Chamber", url: "http://www.lkm.org.mk/" },
+  { name: "Drug Registry", url: "https://lekovi.zdravstvo.gov.mk/" },
+];
+
+const usefulLinks = [
+  { name: "Alo Doktore", url: "http://alodoktore.mk/" },
+  { name: "Medical Simulation Centre", url: "https://msc.gov.mk/" },
+  { name: "Government of North Macedonia", url: "https://vlada.mk/" },
+  { name: "Legal Database", url: "https://ldbis.pravda.gov.mk/" },
+];
+
+/* ─── Stats counters ─── */
+function StatsBar() {
+  const s1 = useCountUp(100000);
+  const s2 = useCountUp(30);
+  const s3 = useCountUp(500);
+  const s4 = useCountUp(31);
+
+  const stats = [
+    { ref: s1.ref, value: `${s1.count.toLocaleString()}+`, label: "Inspections & services performed" },
+    { ref: s2.ref, value: `${s2.count}+`, label: "Operations performed daily" },
+    { ref: s3.ref, value: `${s3.count}+`, label: "Outpatient examinations daily" },
+    { ref: s4.ref, value: String(s4.count), label: "Specialized departments" },
+  ];
+
+  return (
+    <section className="bg-primary py-16">
+      <div className="container grid grid-cols-2 gap-8 md:grid-cols-4">
+        {stats.map((stat) => (
+          <div key={stat.label} ref={stat.ref} className="text-center">
+            <p className="text-3xl font-extrabold text-primary-foreground md:text-4xl">
+              {stat.value}
+            </p>
+            <p className="mt-2 text-sm text-primary-foreground/70">{stat.label}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ─── Page ─── */
 export default function HomePage() {
-  const { t, language } = useTranslation();
+  const deptAnim = useStaggerIn();
 
   return (
     <Layout>
-      {/* Hero */}
-      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
-        <img
-          src={heroImg}
-          alt="Clinical Hospital Tetovo"
-          className="absolute inset-0 w-full h-full object-cover"
-          width={1920}
-          height={1080}
-        />
-        <div className="absolute inset-0 gradient-hero opacity-85" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent" />
-
-        <div className="container relative z-10 py-20">
-          <div className="max-w-2xl animate-slide-up">
-            <Badge className="mb-6 rounded-full bg-primary-foreground/15 text-primary-foreground border-primary-foreground/20 backdrop-blur-sm px-4 py-1.5 text-sm">
-              <Shield className="h-3.5 w-3.5 mr-1.5" />
-              {language === "sq" ? "50+ vite përvojë" : language === "en" ? "50+ years experience" : "50+ години искуство"}
-            </Badge>
-            <h1 className="text-4xl font-extrabold tracking-tight text-primary-foreground md:text-6xl lg:text-7xl leading-[1.1]">
-              {t("hero.title")}
-            </h1>
-            <p className="mt-5 max-w-lg text-lg text-primary-foreground/75 md:text-xl animate-slide-up-delay-1">
-              {t("hero.subtitle")}
+      {/* ══════ HERO ══════ */}
+      <section className="py-16 md:py-24">
+        <div className="container grid items-center gap-12 lg:grid-cols-5">
+          {/* Left 60% */}
+          <div className="lg:col-span-3">
+            <p className="animate-hero text-xs font-semibold uppercase tracking-widest text-accent">
+              Public Health Institution — Tetovo, North Macedonia
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row animate-slide-up-delay-2">
-              <Button asChild size="lg" className="rounded-xl bg-primary-foreground text-primary hover:bg-primary-foreground/90 shadow-lg text-base px-8 h-12">
-                <Link to="/appointments">{t("hero.cta.appointment")}</Link>
+            <h1 className="animate-hero-delay-1 mt-4 text-4xl font-extrabold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
+              Five Decades of Trusted Medical Care
+            </h1>
+            <p className="animate-hero-delay-2 mt-5 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
+              Serving 300,000 patients per year from across the entire region with 31 specialized departments and modern medical standards.
+            </p>
+            <div className="animate-hero-delay-3 mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg" className="rounded-full px-8 py-3 btn-press">
+                <Link to="/contact">Book Appointment</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="rounded-xl border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground backdrop-blur-sm text-base px-8 h-12">
-                <Link to="/departments">{t("hero.cta.departments")}</Link>
+              <Button asChild variant="outline" size="lg" className="rounded-full px-8 py-3 btn-press">
+                <Link to="/departments">Explore Departments</Link>
               </Button>
             </div>
+            <div className="animate-hero-delay-3 mt-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-accent" /> 24/7 Emergency</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-accent" /> 31 Departments</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-accent" /> 50+ Years Experience</span>
+            </div>
           </div>
-        </div>
 
-        {/* Floating stats on hero */}
-        <div className="absolute bottom-0 left-0 right-0 z-10">
-          <div className="container pb-0">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 -mb-12">
-              {[
-                { value: "300,000+", label: t("stats.patients"), icon: Users },
-                { value: "31", label: t("stats.departments"), icon: Award },
-                { value: "50+", label: t("stats.years"), icon: Clock },
-                { value: "24/7", label: t("stats.emergency"), icon: Phone },
-              ].map((stat, i) => (
-                <div
-                  key={stat.label}
-                  className={`glass-card p-4 md:p-5 text-center hover-lift animate-slide-up-delay-${Math.min(i + 1, 3)}`}
-                >
-                  <stat.icon className="h-5 w-5 text-primary mx-auto mb-2" />
-                  <p className="text-xl md:text-2xl font-bold text-foreground">{stat.value}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{stat.label}</p>
-                </div>
-              ))}
+          {/* Right 40% */}
+          <div className="relative lg:col-span-2 animate-hero-delay-2">
+            <img
+              src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=800&q=80"
+              alt="Clinical Hospital Tetovo"
+              className="w-full rounded-2xl object-cover aspect-[4/5]"
+              width={800}
+              height={1000}
+            />
+            {/* Floating stat card */}
+            <div className="absolute -bottom-4 -left-4 rounded-2xl border bg-card p-5 shadow-card sm:bottom-6 sm:left-[-2rem]">
+              <p className="text-3xl font-extrabold text-primary">300,000+</p>
+              <p className="text-sm text-muted-foreground">Patients per year</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Spacer for floating stats */}
-      <div className="h-20" />
+      {/* ══════ STATS BAR ══════ */}
+      <StatsBar />
 
-      {/* Featured Departments */}
-      <section className="py-20">
+      {/* ══════ DEPARTMENTS ══════ */}
+      <section className="py-24">
         <div className="container">
-          <div className="text-center mb-12">
-            <Badge className="mb-3 rounded-full bg-primary/10 text-primary border-primary/20 px-4 py-1">
-              {language === "sq" ? "Shërbimet tona" : language === "en" ? "Our services" : "Наши услуги"}
-            </Badge>
-            <h2 className="text-3xl font-bold md:text-4xl">{t("dept.featured")}</h2>
+          <div className="text-center">
+            <h2 className="text-3xl font-bold md:text-4xl">Our Departments</h2>
+            <p className="mt-3 text-muted-foreground">Specialized care across 31 medical fields</p>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div
+            ref={deptAnim.ref}
+            className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          >
             {departments.map((dept, i) => {
               const Icon = dept.icon;
               return (
-                <Card key={dept.key} className="glass-card hover-lift group border-border/50 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-full" />
-                  <CardHeader className="flex flex-row items-center gap-4 pb-2 relative">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl gradient-primary shadow-md transition-transform duration-300 group-hover:scale-110">
-                      <Icon className="h-5 w-5 text-primary-foreground" />
+                <Card
+                  key={dept.slug}
+                  className="card-hover rounded-2xl border shadow-card overflow-hidden"
+                  style={{
+                    opacity: deptAnim.visible ? 1 : 0,
+                    transform: deptAnim.visible ? "translateY(0)" : "translateY(20px)",
+                    transition: `opacity 0.4s ease ${i * 0.05}s, transform 0.4s ease ${i * 0.05}s`,
+                  }}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
+                      <Icon className="h-6 w-6 text-accent" />
                     </div>
-                    <CardTitle className="text-base font-semibold">{t(`dept.${dept.key}` as any)}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="relative">
-                    <p className="text-sm text-muted-foreground leading-relaxed">{t(`dept.${dept.key}.desc` as any)}</p>
+                    <h3 className="mt-4 text-lg font-semibold">{dept.name}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{dept.desc}</p>
                     <Link
                       to={`/departments/${dept.slug}`}
-                      className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:gap-2.5 transition-all duration-300"
+                      className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                     >
-                      {t("dept.learnMore")} <ArrowRight className="h-3.5 w-3.5" />
+                      Learn more <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
                   </CardContent>
                 </Card>
@@ -167,36 +245,48 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ER Wait Times */}
-      <section
-        className="relative py-20 overflow-hidden"
-      >
-        <img
-          src={medicalBg}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
-          loading="lazy"
-          width={1920}
-          height={512}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 to-background/80" />
-        <div className="container relative z-10">
-          <div className="flex items-center justify-center gap-3 mb-10">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-primary shadow-md">
-              <Activity className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <h2 className="text-2xl font-bold md:text-3xl">{t("er.title")}</h2>
+      {/* ══════ ABOUT SECTION ══════ */}
+      <section className="py-24 bg-secondary">
+        <div className="container grid gap-12 lg:grid-cols-2">
+          {/* Image grid */}
+          <div className="grid grid-cols-2 gap-4">
+            <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&q=80" alt="Hospital exterior" className="rounded-2xl object-cover w-full h-48 lg:h-56" loading="lazy" />
+            <img src="https://images.unsplash.com/photo-1504813184591-01572f98c85f?w=600&q=80" alt="Hospital hallway" className="rounded-2xl object-cover w-full h-48 lg:h-56" loading="lazy" />
+            <img src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=600&q=80" alt="Operating room" className="rounded-2xl object-cover w-full h-48 lg:h-56" loading="lazy" />
+            <img src="https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=600&q=80" alt="Doctor with patient" className="rounded-2xl object-cover w-full h-48 lg:h-56" loading="lazy" />
           </div>
-          <div className="mx-auto grid max-w-3xl gap-5 sm:grid-cols-3">
-            {waitTimes.map((wt) => (
-              <Card key={wt.key} className="glass-card text-center hover-lift border-border/50">
-                <CardContent className="pt-8 pb-8">
-                  <p className="text-sm font-medium text-muted-foreground">{t(wt.key as any)}</p>
-                  <p className="mt-3 text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">{wt.time}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{t("er.minutes")}</p>
-                  <Badge className={`mt-4 rounded-full px-3 ${statusColor[wt.status]}`}>
-                    {wt.status === "green" ? "Low" : wt.status === "yellow" ? "Moderate" : "High"}
-                  </Badge>
+
+          {/* Text */}
+          <div className="flex flex-col justify-center">
+            <p className="text-xs font-semibold uppercase tracking-widest text-accent">About the hospital</p>
+            <h2 className="mt-3 text-3xl font-bold md:text-4xl">
+              Health care according to modern medical standards
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-muted-foreground">
+              PHI Clinical Hospital Tetovo is a Public Health Institution with rights, obligations and responsibilities established by law, collective agreement, statute and other general acts. Health care is one of the important elements for preserving and improving the health, living and working environment of citizens, and a significant factor for economic development.
+            </p>
+            <Button asChild variant="outline" size="lg" className="mt-8 w-fit rounded-full px-8 btn-press">
+              <Link to="/about">More about the hospital <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════ PUBLIC INFORMATION ══════ */}
+      <section className="py-24 bg-muted">
+        <div className="container">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold md:text-4xl">Public Information</h2>
+            <p className="mt-3 max-w-2xl mx-auto text-muted-foreground">
+              In accordance with the Law on Free Access to Public Information, openness in the operation of the Hospital is ensured.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-4 grid-cols-2 md:grid-cols-4">
+            {publicInfoItems.map((item) => (
+              <Card key={item} className="card-hover rounded-2xl border shadow-card cursor-pointer">
+                <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
+                  <FileText className="h-8 w-8 text-primary" />
+                  <p className="text-sm font-semibold">{item}</p>
                 </CardContent>
               </Card>
             ))}
@@ -204,54 +294,35 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Symptom Checker */}
-      <section className="py-20">
+      {/* ══════ NEWS ══════ */}
+      <section className="py-24">
         <div className="container">
-          <div className="relative overflow-hidden rounded-2xl gradient-hero p-10 md:p-16 text-center">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,hsl(203_73%_50%/0.3),transparent_70%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,hsl(210_60%_45%/0.3),transparent_50%)]" />
-            <div className="relative z-10">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-foreground/15 backdrop-blur-sm mb-6 animate-float">
-                <Stethoscope className="h-8 w-8 text-primary-foreground" />
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-primary-foreground">{t("symptom.title")}</h2>
-              <p className="mt-3 text-primary-foreground/70 max-w-md mx-auto">
-                {language === "sq" ? "AI asistenti ynë do t'ju ndihmojë të gjeni departamentin e duhur" : language === "en" ? "Our AI assistant will help you find the right department" : "Нашиот AI асистент ќе ви помогне да го најдете вистинското одделение"}
-              </p>
-              <Button asChild size="lg" className="mt-8 rounded-xl bg-primary-foreground text-primary hover:bg-primary-foreground/90 shadow-lg px-8 h-12">
-                <Link to="/symptom-checker">{t("symptom.cta")}</Link>
-              </Button>
-            </div>
+          <div className="text-center">
+            <h2 className="text-3xl font-bold md:text-4xl">Latest News</h2>
           </div>
-        </div>
-      </section>
-
-      {/* News */}
-      <section className="py-20 gradient-accent">
-        <div className="container">
-          <div className="text-center mb-12">
-            <Badge className="mb-3 rounded-full bg-primary/10 text-primary border-primary/20 px-4 py-1">
-              {language === "sq" ? "Lajme" : language === "en" ? "News" : "Вести"}
-            </Badge>
-            <h2 className="text-3xl font-bold md:text-4xl">{t("news.title")}</h2>
-          </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {news.map((item, i) => (
-              <Card key={i} className="glass-card overflow-hidden hover-lift group border-border/50">
-                <div className="h-44 bg-gradient-to-br from-primary/10 via-primary/5 to-accent relative overflow-hidden">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,hsl(203_73%_38%/0.15),transparent_60%)]" />
-                  <div className="absolute bottom-3 left-4">
-                    <Badge variant="secondary" className="rounded-full text-xs backdrop-blur-sm bg-background/80">{item.date}</Badge>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {newsItems.map((item) => (
+              <Card key={item.slug} className="card-hover rounded-2xl border shadow-card overflow-hidden">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="h-48 w-full object-cover"
+                  loading="lazy"
+                />
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">{item.date}</span>
+                    <Badge className="rounded-full bg-accent text-accent-foreground text-xs px-2.5 py-0.5">
+                      {item.category}
+                    </Badge>
                   </div>
-                </div>
-                <CardContent className="pt-5">
-                  <h3 className="font-semibold text-base group-hover:text-primary transition-colors duration-300">{item.title[language]}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{item.excerpt[language]}</p>
+                  <h3 className="mt-3 text-base font-semibold leading-snug">{item.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed line-clamp-2">{item.excerpt}</p>
                   <Link
-                    to="/news"
-                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:gap-2.5 transition-all duration-300"
+                    to={`/news/${item.slug}`}
+                    className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                   >
-                    {t("news.readMore")} <ArrowRight className="h-3.5 w-3.5" />
+                    Read more <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </CardContent>
               </Card>
@@ -260,23 +331,41 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Partners */}
-      <section className="py-16">
+      {/* ══════ PARTNERS ══════ */}
+      <section className="py-16 bg-secondary">
         <div className="container">
-          <p className="text-center text-sm text-muted-foreground mb-8">
-            {language === "sq" ? "Partnerët tanë" : language === "en" ? "Our partners" : "Наши партнери"}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
-            {[
-              language === "mk" ? "Министерство за здравство" : language === "sq" ? "Ministria e Shëndetësisë" : "Ministry of Health",
-              language === "mk" ? "Фонд за здравство" : language === "sq" ? "Fondi Shëndetësor" : "Health Insurance Fund",
-              language === "mk" ? "Регулаторна агенција" : language === "sq" ? "Agjencia Rregullatore" : "Drug Registry Agency",
-            ].map((name) => (
-              <div key={name} className="glass-card flex h-14 items-center px-8 text-sm font-medium text-muted-foreground hover-lift">
-                {name}
-              </div>
+          <h3 className="text-center text-lg font-semibold mb-8">Our Partners</h3>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {partners.map((p) => (
+              <a
+                key={p.name}
+                href={p.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="card-hover flex items-center gap-2 rounded-2xl border bg-card px-6 py-4 text-sm font-medium shadow-card"
+              >
+                <ExternalLink className="h-4 w-4 text-primary" />
+                {p.name}
+              </a>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ══════ USEFUL LINKS ══════ */}
+      <section className="py-12">
+        <div className="container flex flex-wrap items-center justify-center gap-6">
+          {usefulLinks.map((link) => (
+            <a
+              key={link.name}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              {link.name}
+            </a>
+          ))}
         </div>
       </section>
     </Layout>

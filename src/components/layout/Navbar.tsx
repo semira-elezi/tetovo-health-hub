@@ -1,61 +1,70 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Globe, ChevronDown } from "lucide-react";
+import { Menu, X, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useTranslation, Language } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { useTranslation, Language } from "@/lib/i18n";
+
+const navLinks = [
+  { to: "/", label: "Home" },
+  { to: "/about", label: "About" },
+  { to: "/departments", label: "Departments" },
+  { to: "/news", label: "News" },
+  { to: "/contact", label: "Contact" },
+];
 
 const languages: { code: Language; label: string }[] = [
+  { code: "mk", label: "MK" },
   { code: "sq", label: "SQ" },
-  { code: "mk", label: "МК" },
   { code: "en", label: "EN" },
 ];
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { t, language, setLanguage } = useTranslation();
+  const [scrolled, setScrolled] = useState(false);
+  const { language, setLanguage } = useTranslation();
   const location = useLocation();
 
-  const links = [
-    { to: "/", label: t("nav.home") },
-    { to: "/departments", label: t("nav.departments") },
-    { to: "/appointments", label: t("nav.appointments") },
-    { to: "/news", label: t("nav.news") },
-    { to: "/contact", label: t("nav.contact") },
-  ];
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const isActive = (path: string) =>
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
 
   return (
-    <header className="sticky top-0 z-50 glass-navbar">
+    <header
+      className={cn(
+        "sticky top-0 z-50 bg-card border-b transition-shadow duration-200",
+        scrolled && "shadow-card"
+      )}
+    >
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl gradient-primary shadow-md transition-transform duration-300 group-hover:scale-110">
-            <span className="text-sm font-bold text-primary-foreground">SKT</span>
+        <Link to="/" className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M7 3h2v10H7V3z" fill="white" />
+              <path d="M3 7h10v2H3V7z" fill="white" />
+            </svg>
           </div>
-          <span className="hidden font-bold text-foreground sm:inline-block tracking-tight">
-            {language === "sq" ? "Spitali Klinik Tetovë" : language === "en" ? "Clinical Hospital Tetovo" : "Клиничка Болница Тетово"}
+          <span className="hidden text-sm font-bold text-foreground sm:inline-block">
+            Clinical Hospital Tetovo
           </span>
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden items-center gap-0.5 md:flex">
-          {links.map((link) => (
+        <nav className="hidden items-center gap-1 md:flex">
+          {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
               className={cn(
-                "relative rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-300 hover:bg-primary/5",
+                "px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150",
                 isActive(link.to)
-                  ? "text-primary after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:w-5 after:rounded-full after:bg-primary"
+                  ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -65,37 +74,39 @@ export default function Navbar() {
         </nav>
 
         {/* Right side */}
-        <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-1.5 rounded-lg hover:bg-primary/5">
-                <Globe className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{languages.find((l) => l.code === language)?.label}</span>
-                <ChevronDown className="h-3 w-3 text-muted-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="glass-card">
-              {languages.map((lang) => (
-                <DropdownMenuItem
-                  key={lang.code}
-                  onClick={() => setLanguage(lang.code)}
-                  className={cn("rounded-md", language === lang.code && "bg-primary/10 text-primary")}
-                >
-                  {lang.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="flex items-center gap-3">
+          {/* Language switcher */}
+          <div className="hidden sm:flex items-center gap-0.5 rounded-lg border p-0.5">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => setLanguage(lang.code)}
+                className={cn(
+                  "px-2 py-1 text-xs font-medium rounded-md transition-colors duration-150",
+                  language === lang.code
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {lang.label}
+              </button>
+            ))}
+          </div>
 
-          <Button asChild size="sm" className="hidden sm:inline-flex rounded-lg gradient-primary border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
-            <Link to="/auth/login">{t("nav.login")}</Link>
-          </Button>
+          {/* Phone */}
+          <a
+            href="tel:+38975200304"
+            className="hidden lg:flex items-center gap-1.5 text-sm font-medium text-foreground"
+          >
+            <Phone className="h-4 w-4 text-primary" />
+            +389 75 200 304
+          </a>
 
           {/* Mobile toggle */}
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden rounded-lg"
+            className="md:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -103,30 +114,50 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Nav */}
+      {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="border-t border-border/50 md:hidden animate-slide-up">
-          <nav className="container flex flex-col gap-1 py-3">
-            {links.map((link) => (
+        <div className="fixed inset-0 top-16 z-50 bg-card md:hidden animate-fade-in">
+          <nav className="container flex flex-col gap-1 py-6">
+            {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-primary/5",
-                  isActive(link.to) ? "text-primary bg-primary/5" : "text-muted-foreground"
+                  "px-4 py-3 text-base font-medium rounded-lg transition-colors",
+                  isActive(link.to)
+                    ? "text-primary bg-secondary"
+                    : "text-muted-foreground hover:bg-secondary"
                 )}
               >
                 {link.label}
               </Link>
             ))}
-            <Link
-              to="/auth/login"
-              onClick={() => setMobileOpen(false)}
-              className="mt-2 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-foreground text-center gradient-primary"
+
+            <div className="mt-6 flex items-center gap-1 px-4">
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => setLanguage(lang.code)}
+                  className={cn(
+                    "px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                    language === lang.code
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground border"
+                  )}
+                >
+                  {lang.label}
+                </button>
+              ))}
+            </div>
+
+            <a
+              href="tel:+38975200304"
+              className="mt-4 mx-4 flex items-center gap-2 text-sm font-medium text-primary"
             >
-              {t("nav.login")}
-            </Link>
+              <Phone className="h-4 w-4" />
+              +389 75 200 304
+            </a>
           </nav>
         </div>
       )}

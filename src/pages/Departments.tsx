@@ -1,150 +1,137 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
-  Heart, AlertTriangle, Scissors, Brain, Baby, Users,
-  Eye, Ear, Bone, Pill, Microscope, Syringe, Stethoscope,
-  Thermometer, Activity, Scan, Droplets, Shield, Zap,
-  Leaf, Smile, BrainCircuit, MonitorSpeaker, Layers,
-  Radiation, Waves, CircleDot, FlaskConical, Laptop, Star, Search,
+  Heart, Activity, Scissors, Brain, Baby, Stethoscope,
+  Droplets, Shield, Eye, Wind, Target, Search,
+  Scan, Microscope, Pill, AlertCircle, Smile, Dumbbell,
+  Volume2, Users,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useTranslation } from "@/lib/i18n";
+import { Input } from "@/components/ui/input";
 import Layout from "@/components/layout/Layout";
 
 const allDepartments = [
-  { slug: "cardiology", icon: Heart, category: "Internal", head: "Dr. Arben Ismaili" },
-  { slug: "emergency", icon: AlertTriangle, category: "Emergency", head: "Dr. Blerim Selmani" },
-  { slug: "surgery", icon: Scissors, category: "Surgery", head: "Dr. Marko Petrov" },
-  { slug: "neurology", icon: Brain, category: "Internal", head: "Dr. Elena Stojanova" },
-  { slug: "pediatrics", icon: Baby, category: "Internal", head: "Dr. Faton Rexhepi" },
-  { slug: "gynecology", icon: Users, category: "Surgery", head: "Dr. Alma Demiri" },
-  { slug: "ophthalmology", icon: Eye, category: "Diagnostics", head: "Dr. Igor Trajkov" },
-  { slug: "ent", icon: Ear, category: "Surgery", head: "Dr. Shpresa Aliu" },
-  { slug: "orthopedics", icon: Bone, category: "Surgery", head: "Dr. Nikola Ristov" },
-  { slug: "dermatology", icon: Smile, category: "Internal", head: "Dr. Teuta Bexheti" },
-  { slug: "urology", icon: Shield, category: "Surgery", head: "Dr. Risto Markovski" },
-  { slug: "oncology", icon: Radiation, category: "Internal", head: "Dr. Besnik Osmani" },
-  { slug: "pulmonology", icon: Waves, category: "Internal", head: "Dr. Vesna Ilievska" },
-  { slug: "gastroenterology", icon: CircleDot, category: "Internal", head: "Dr. Agim Sherifi" },
-  { slug: "nephrology", icon: Droplets, category: "Internal", head: "Dr. Gordana Popova" },
-  { slug: "endocrinology", icon: Activity, category: "Internal", head: "Dr. Lindita Xhaferi" },
-  { slug: "rheumatology", icon: Zap, category: "Internal", head: "Dr. Dejan Milosev" },
-  { slug: "hematology", icon: FlaskConical, category: "Internal", head: "Dr. Nexhbedin Beadini" },
-  { slug: "infectious-diseases", icon: Microscope, category: "Internal", head: "Dr. Ana Kostova" },
-  { slug: "psychiatry", icon: BrainCircuit, category: "Internal", head: "Dr. Bujar Memedi" },
-  { slug: "anesthesiology", icon: Syringe, category: "Surgery", head: "Dr. Maja Janeva" },
-  { slug: "radiology", icon: Scan, category: "Diagnostics", head: "Dr. Driton Musliu" },
-  { slug: "pathology", icon: Layers, category: "Diagnostics", head: "Dr. Suzana Petrovic" },
-  { slug: "laboratory", icon: FlaskConical, category: "Diagnostics", head: "Dr. Erion Iseni" },
-  { slug: "physical-therapy", icon: Leaf, category: "Internal", head: "Dr. Olivera Markova" },
-  { slug: "neonatology", icon: Baby, category: "Internal", head: "Dr. Kushtrim Ademi" },
-  { slug: "intensive-care", icon: MonitorSpeaker, category: "Emergency", head: "Dr. Biljana Trajkova" },
-  { slug: "maxillofacial", icon: Smile, category: "Surgery", head: "Dr. Valon Krasniqi" },
-  { slug: "thoracic-surgery", icon: Stethoscope, category: "Surgery", head: "Dr. Aleksandar Stoev" },
-  { slug: "vascular-surgery", icon: Activity, category: "Surgery", head: "Dr. Mensur Ajdari" },
-  { slug: "nuclear-medicine", icon: Laptop, category: "Diagnostics", head: "Dr. Ivana Nikolova" },
+  { slug: "cardiology", name: "Cardiology", desc: "Diagnosis and treatment of heart and vascular diseases.", icon: Heart, category: "Internal" },
+  { slug: "interventional-cardiology", name: "Interventional Cardiology", desc: "Minimally invasive cardiac procedures and catheterization.", icon: Activity, category: "Internal" },
+  { slug: "general-surgery-traumatology", name: "General Surgery & Traumatology", desc: "Surgical treatment of injuries and trauma.", icon: Scissors, category: "Surgery" },
+  { slug: "general-visceral-surgery", name: "General and Visceral Surgery", desc: "Surgical procedures on abdominal and visceral organs.", icon: Scissors, category: "Surgery" },
+  { slug: "neurosurgery", name: "Neurosurgery", desc: "Surgical treatment of brain, spine, and nervous system disorders.", icon: Brain, category: "Surgery" },
+  { slug: "neurology", name: "Neurology", desc: "Diagnosis and treatment of neurological diseases.", icon: Brain, category: "Internal" },
+  { slug: "orthopedics", name: "Orthopedics", desc: "Treatment of musculoskeletal disorders and joint surgery.", icon: Activity, category: "Surgery" },
+  { slug: "maxillofacial-surgery", name: "Maxillofacial Surgery", desc: "Surgery of the jaw, face, and mouth.", icon: Smile, category: "Surgery" },
+  { slug: "thoracic-surgery", name: "Thoracic Surgery", desc: "Surgery of the chest, lungs, and mediastinum.", icon: Wind, category: "Surgery" },
+  { slug: "gynecology", name: "Gynecology & Obstetrics", desc: "Women's health, pregnancy, and childbirth.", icon: Baby, category: "Surgery" },
+  { slug: "neonatology", name: "Neonatology", desc: "Care of newborns and premature infants.", icon: Baby, category: "Internal" },
+  { slug: "neonatal-intensive-care", name: "Neonatal Intensive Care", desc: "Intensive care for critically ill newborns.", icon: Baby, category: "Emergency" },
+  { slug: "pediatrics", name: "Department of Children's Diseases", desc: "Pediatric medicine and child healthcare.", icon: Baby, category: "Internal" },
+  { slug: "internal-medicine", name: "Internal Medicine", desc: "Diagnosis and treatment of internal organ diseases.", icon: Stethoscope, category: "Internal" },
+  { slug: "diabetes", name: "Diabetes & Metabolic Diseases", desc: "Management of diabetes and metabolic disorders.", icon: Droplets, category: "Internal" },
+  { slug: "respiratory", name: "Respiratory Diseases", desc: "Diagnosis of lung and respiratory conditions.", icon: Wind, category: "Internal" },
+  { slug: "psychiatry", name: "Psychiatry", desc: "Mental health diagnosis, treatment, and support.", icon: Brain, category: "Specialized" },
+  { slug: "dermatovenerology", name: "Dermatovenerology", desc: "Skin diseases and sexually transmitted infections.", icon: Shield, category: "Specialized" },
+  { slug: "ophthalmology", name: "Ophthalmology", desc: "Eye diseases and surgical vision correction.", icon: Eye, category: "Specialized" },
+  { slug: "ent", name: "Otorinolaryngology (ENT)", desc: "Ear, nose, and throat diseases.", icon: Volume2, category: "Specialized" },
+  { slug: "urology", name: "Urology", desc: "Urinary tract and male reproductive system disorders.", icon: Droplets, category: "Surgery" },
+  { slug: "oncology", name: "Oncology", desc: "Diagnosis and cytostatic therapy of cancer.", icon: Target, category: "Internal" },
+  { slug: "infectology", name: "Infectology", desc: "Treatment of infectious and parasitic diseases.", icon: Shield, category: "Internal" },
+  { slug: "anesthesia-icu", name: "Anesthesia, Resuscitation & Intensive Care", desc: "Perioperative and critical care.", icon: Activity, category: "Emergency" },
+  { slug: "physical-rehabilitation", name: "Physical Medicine & Rehabilitation", desc: "Physical therapy and functional recovery.", icon: Dumbbell, category: "Specialized" },
+  { slug: "biochemical-lab", name: "Biochemical Laboratory Medicine", desc: "Laboratory diagnostics and analysis.", icon: Microscope, category: "Diagnostics" },
+  { slug: "radiodiagnostics", name: "Radiodiagnostics", desc: "Medical imaging: X-ray, CT, MRI, ultrasound.", icon: Scan, category: "Diagnostics" },
+  { slug: "forensic-medicine", name: "Forensic Medicine", desc: "Legal medical examinations and autopsies.", icon: Shield, category: "Diagnostics" },
+  { slug: "pathological-anatomy", name: "Pathological Anatomy", desc: "Tissue analysis and histopathological diagnostics.", icon: Microscope, category: "Diagnostics" },
+  { slug: "pharmacy", name: "Hospital Pharmacy", desc: "Dispensing and management of medications.", icon: Pill, category: "Specialized" },
+  { slug: "emergency-medicine", name: "Emergency Medicine", desc: "24/7 emergency and acute care services.", icon: AlertCircle, category: "Emergency" },
 ];
 
-const categories = ["All", "Surgery", "Internal", "Diagnostics", "Emergency"];
+export { allDepartments };
 
-const deptNames: Record<string, Record<string, string>> = {
-  cardiology: { mk: "Кардиологија", sq: "Kardiologji", en: "Cardiology" },
-  emergency: { mk: "Итна помош", sq: "Urgjenca", en: "Emergency" },
-  surgery: { mk: "Хирургија", sq: "Kirurgji", en: "Surgery" },
-  neurology: { mk: "Неврологија", sq: "Neurologji", en: "Neurology" },
-  pediatrics: { mk: "Педијатрија", sq: "Pediatri", en: "Pediatrics" },
-  gynecology: { mk: "Гинекологија", sq: "Gjinekologji", en: "Gynecology" },
-  ophthalmology: { mk: "Офталмологија", sq: "Oftalmologji", en: "Ophthalmology" },
-  ent: { mk: "ОРЛ", sq: "ORL", en: "ENT" },
-  orthopedics: { mk: "Ортопедија", sq: "Ortopedi", en: "Orthopedics" },
-  dermatology: { mk: "Дерматологија", sq: "Dermatologji", en: "Dermatology" },
-  urology: { mk: "Урологија", sq: "Urologji", en: "Urology" },
-  oncology: { mk: "Онкологија", sq: "Onkologji", en: "Oncology" },
-  pulmonology: { mk: "Пулмологија", sq: "Pulmonologji", en: "Pulmonology" },
-  gastroenterology: { mk: "Гастроентерологија", sq: "Gastroenterologji", en: "Gastroenterology" },
-  nephrology: { mk: "Нефрологија", sq: "Nefrologji", en: "Nephrology" },
-  endocrinology: { mk: "Ендокринологија", sq: "Endokrinologji", en: "Endocrinology" },
-  rheumatology: { mk: "Ревматологија", sq: "Reumatologji", en: "Rheumatology" },
-  hematology: { mk: "Хематологија", sq: "Hematologji", en: "Hematology" },
-  "infectious-diseases": { mk: "Инфективни болести", sq: "Sëmundje infektive", en: "Infectious Diseases" },
-  psychiatry: { mk: "Психијатрија", sq: "Psikiatri", en: "Psychiatry" },
-  anesthesiology: { mk: "Анестезиологија", sq: "Anesteziologji", en: "Anesthesiology" },
-  radiology: { mk: "Радиологија", sq: "Radiologji", en: "Radiology" },
-  pathology: { mk: "Патологија", sq: "Patologji", en: "Pathology" },
-  laboratory: { mk: "Лабораторија", sq: "Laboratori", en: "Laboratory" },
-  "physical-therapy": { mk: "Физикална терапија", sq: "Fizioterapi", en: "Physical Therapy" },
-  neonatology: { mk: "Неонатологија", sq: "Neonatologji", en: "Neonatology" },
-  "intensive-care": { mk: "Интензивна нега", sq: "Kujdesi intensiv", en: "Intensive Care" },
-  maxillofacial: { mk: "Максилофацијална", sq: "Maksilofaciale", en: "Maxillofacial" },
-  "thoracic-surgery": { mk: "Торакална хирургија", sq: "Kirurgji torakale", en: "Thoracic Surgery" },
-  "vascular-surgery": { mk: "Васкуларна хирургија", sq: "Kirurgji vaskulare", en: "Vascular Surgery" },
-  "nuclear-medicine": { mk: "Нуклеарна медицина", sq: "Mjekësi bërthamore", en: "Nuclear Medicine" },
-};
-
-export { allDepartments, deptNames };
+const categories = ["All", "Surgery", "Internal", "Diagnostics", "Emergency", "Specialized"];
 
 export default function DepartmentsPage() {
-  const { t, language } = useTranslation();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { threshold: 0.05 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  // Reset animation when filters change
+  useEffect(() => {
+    setVisible(false);
+    const t = setTimeout(() => setVisible(true), 50);
+    return () => clearTimeout(t);
+  }, [search, category]);
 
   const filtered = allDepartments.filter((d) => {
-    const name = deptNames[d.slug]?.[language] || d.slug;
-    const matchSearch = name.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = d.name.toLowerCase().includes(search.toLowerCase());
     const matchCat = category === "All" || d.category === category;
     return matchSearch && matchCat;
   });
 
   return (
     <Layout>
-      <div className="container py-10">
-        <h1 className="text-3xl font-bold">{t("departments.title")}</h1>
-        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder={t("departments.search")}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
-              <Badge
-                key={cat}
-                variant={category === cat ? "default" : "outline"}
-                className="cursor-pointer"
-                onClick={() => setCategory(cat)}
-              >
-                {cat}
-              </Badge>
-            ))}
-          </div>
+      <div className="container py-16">
+        <h1 className="text-3xl font-bold md:text-4xl">Our 31 Departments</h1>
+
+        {/* Search */}
+        <div className="mt-8 relative">
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search departments..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-12 h-12 rounded-2xl text-base"
+          />
         </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((dept) => {
+        {/* Filters */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          {categories.map((cat) => (
+            <Badge
+              key={cat}
+              variant={category === cat ? "default" : "outline"}
+              className="cursor-pointer rounded-full px-4 py-1.5 text-sm"
+              onClick={() => setCategory(cat)}
+            >
+              {cat}
+            </Badge>
+          ))}
+        </div>
+
+        {/* Grid */}
+        <div ref={gridRef} className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {filtered.map((dept, i) => {
             const Icon = dept.icon;
-            const name = deptNames[dept.slug]?.[language] || dept.slug;
             return (
-              <Card key={dept.slug} className="transition-shadow hover:shadow-md">
-                <CardHeader className="flex flex-row items-center gap-3 pb-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
-                    <Icon className="h-5 w-5 text-primary" />
+              <Card
+                key={dept.slug}
+                className="card-hover rounded-2xl border shadow-card"
+                style={{
+                  opacity: visible ? 1 : 0,
+                  transform: visible ? "translateY(0)" : "translateY(20px)",
+                  transition: `opacity 0.3s ease ${i * 0.05}s, transform 0.3s ease ${i * 0.05}s`,
+                }}
+              >
+                <CardContent className="p-5">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
+                    <Icon className="h-5 w-5 text-accent" />
                   </div>
-                  <div>
-                    <CardTitle className="text-base">{name}</CardTitle>
-                    <p className="text-xs text-muted-foreground">{dept.head}</p>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <Badge variant="secondary" className="text-xs">{dept.category}</Badge>
-                  <Button asChild variant="link" size="sm" className="mt-2 px-0">
-                    <Link to={`/departments/${dept.slug}`}>{t("departments.viewDept")}</Link>
+                  <h3 className="mt-3 text-sm font-semibold leading-snug">{dept.name}</h3>
+                  <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">{dept.desc}</p>
+                  <Button asChild variant="link" size="sm" className="mt-2 h-auto p-0 text-xs text-primary">
+                    <Link to={`/departments/${dept.slug}`}>View department</Link>
                   </Button>
                 </CardContent>
               </Card>
