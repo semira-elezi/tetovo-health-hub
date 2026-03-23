@@ -1,82 +1,122 @@
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin, ArrowUpRight } from "lucide-react";
-import { useTranslation } from "@/lib/i18n";
+import { Phone, Mail, MapPin, ExternalLink } from "lucide-react";
+import { useTranslation, Language } from "@/lib/i18n";
 
 export default function Footer() {
-  const { t, language } = useTranslation();
+  const { language, setLanguage } = useTranslation();
 
   return (
-    <footer className="relative overflow-hidden border-t border-border/50">
-      <div className="absolute inset-0 bg-gradient-to-b from-background to-muted/30" />
-      <div className="container relative z-10 py-14">
+    <footer className="bg-foreground text-background">
+      <div className="container py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Brand */}
+          {/* Column 1 — Brand */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl gradient-primary shadow-md">
-                <span className="text-xs font-bold text-primary-foreground">SKT</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M7 3h2v10H7V3z" fill="white" />
+                  <path d="M3 7h10v2H3V7z" fill="white" />
+                </svg>
               </div>
-              <span className="font-bold tracking-tight">
-                {language === "sq" ? "Spitali Klinik Tetovë" : language === "en" ? "Clinical Hospital Tetovo" : "Клиничка Болница Тетово"}
-              </span>
+              <span className="text-sm font-bold">Clinical Hospital Tetovo</span>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">{t("footer.address")}</p>
+            <p className="text-sm text-background/60 leading-relaxed">
+              Public Health Institution — Tetovo, North Macedonia
+            </p>
+            <div className="mt-4 flex items-center gap-3">
+              <a
+                href="https://www.facebook.com/KlinikaTetovo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-background/60 hover:text-background transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </a>
+              <a
+                href="https://www.youtube.com/@clinicalhtetovo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-background/60 hover:text-background transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Column 2 — Information */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold">{t("nav.departments")}</h4>
+            <h4 className="mb-4 text-sm font-semibold">Information</h4>
             <div className="flex flex-col gap-2.5">
-              {["cardiology", "emergency", "surgery"].map((dept) => (
+              {["About us", "Laws", "Management", "Administration"].map((item) => (
                 <Link
-                  key={dept}
-                  to="/departments"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 group"
+                  key={item}
+                  to="/about"
+                  className="text-sm text-background/60 hover:text-background transition-colors"
                 >
-                  {t(`dept.${dept}` as any)}
-                  <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {item}
                 </Link>
               ))}
             </div>
           </div>
 
-          {/* Contact */}
+          {/* Column 3 — Policies & Links */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold">{t("contact.title")}</h4>
-            <div className="flex flex-col gap-3 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                  <Phone className="h-3.5 w-3.5 text-primary" />
-                </div>
-                +389 44 334 100
-              </div>
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                  <Mail className="h-3.5 w-3.5 text-primary" />
-                </div>
-                info@kbt.mk
-              </div>
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                  <MapPin className="h-3.5 w-3.5 text-primary" />
-                </div>
-                {t("footer.address")}
-              </div>
+            <h4 className="mb-4 text-sm font-semibold">Policies & Links</h4>
+            <div className="flex flex-col gap-2.5">
+              <Link to="/about" className="text-sm text-background/60 hover:text-background transition-colors">
+                Rights and obligations of patients
+              </Link>
+              <a href="http://alodoktore.mk/" target="_blank" rel="noopener noreferrer" className="text-sm text-background/60 hover:text-background transition-colors">
+                Alo Doktore
+              </a>
+              <a href="https://msc.gov.mk/" target="_blank" rel="noopener noreferrer" className="text-sm text-background/60 hover:text-background transition-colors">
+                Medical Simulation Centre
+              </a>
+              <a href="https://vlada.mk/" target="_blank" rel="noopener noreferrer" className="text-sm text-background/60 hover:text-background transition-colors">
+                Government of North Macedonia
+              </a>
             </div>
           </div>
 
-          {/* Emergency */}
+          {/* Column 4 — Contact */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold">{t("contact.emergencyLine")}</h4>
-            <div className="glass-card p-5 text-center">
-              <p className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">194</p>
-              <p className="mt-1 text-sm text-muted-foreground">24/7</p>
+            <h4 className="mb-4 text-sm font-semibold">Contact</h4>
+            <div className="flex flex-col gap-3 text-sm text-background/60">
+              <div className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
+                <span>st. 29 Noemvri bb, 1200 Tetovo</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4 shrink-0" />
+                <span>+389 75 200 304</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 shrink-0" />
+                <span>kbtetovo@zdravstvo.gov.mk</span>
+              </div>
+            </div>
+
+            {/* Language switcher */}
+            <div className="mt-5 flex items-center gap-1">
+              {(["mk", "sq", "en"] as Language[]).map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => setLanguage(lang)}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
+                    language === lang
+                      ? "bg-primary text-primary-foreground"
+                      : "text-background/50 hover:text-background"
+                  }`}
+                >
+                  {lang.toUpperCase()}
+                </button>
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="mt-12 border-t border-border/50 pt-6 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} {language === "sq" ? "Spitali Klinik Tetovë" : "Clinical Hospital Tetovo"}. {t("footer.rights")}
+        <div className="mt-12 border-t border-background/10 pt-6 text-center text-sm text-background/40">
+          © 2025 Clinical Hospital Tetovo. All rights reserved. Powered by Optimus Solutions.
         </div>
       </div>
     </footer>
