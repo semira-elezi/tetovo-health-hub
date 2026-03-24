@@ -89,6 +89,10 @@ function AddDoctorDialog() {
 function NewsDialog({ article, onClose }: { article?: any; onClose: () => void }) {
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(article?.image_url || null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const isEdit = !!article;
 
   const [form, setForm] = useState({
@@ -106,38 +110,61 @@ function NewsDialog({ article, onClose }: { article?: any; onClose: () => void }
     title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
   const handleTitleChange = (value: string) => {
-    setForm((f) => ({
-      ...f,
-      title: value,
-      slug: isEdit ? f.slug : generateSlug(value),
-    }));
+    setForm((f) => ({ ...f, title: value, slug: isEdit ? f.slug : generateSlug(value) }));
+  };
+
+  const uploadImage = useCallback(async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file"); return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB"); return;
+    }
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error } = await supabase.storage.from("news-images").upload(fileName, file);
+    if (error) {
+      toast.error("Upload failed: " + error.message);
+      setUploading(false); return;
+    }
+    const { data: urlData } = supabase.storage.from("news-images").getPublicUrl(fileName);
+    setForm((f) => ({ ...f, image_url: urlData.publicUrl }));
+    setImagePreview(urlData.publicUrl);
+    setUploading(false);
+    toast.success("Image uploaded!");
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault(); setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) uploadImage(file);
+  }, [uploadImage]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) uploadImage(file);
+  };
+
+  const removeImage = () => {
+    setForm((f) => ({ ...f, image_url: "" }));
+    setImagePreview(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.slug) { toast.error("Title and slug are required"); return; }
     setLoading(true);
-
-    const payload = {
-      ...form,
-      published_at: form.is_published ? new Date().toISOString() : null,
-    };
-
+    const payload = { ...form, published_at: form.is_published ? new Date().toISOString() : null };
     let error;
     if (isEdit) {
       ({ error } = await supabase.from("news").update(payload).eq("id", article.id));
     } else {
       ({ error } = await supabase.from("news").insert(payload));
     }
-
     setLoading(false);
-    if (error) {
-      toast.error("Failed to save: " + error.message);
-    } else {
-      toast.success(isEdit ? "Article updated!" : "Article created!");
-      queryClient.invalidateQueries({ queryKey: ["admin-news"] });
-      onClose();
-    }
+    if (error) toast.error("Failed to save: " + error.message);
+    else { toast.success(isEdit ? "Article updated!" : "Article created!"); queryClient.invalidateQueries({ queryKey: ["admin-news"] }); onClose(); }
   };
 
   return (
@@ -168,10 +195,45 @@ function NewsDialog({ article, onClose }: { article?: any; onClose: () => void }
           <Input value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })} placeholder="Author name" />
         </div>
       </div>
+
+      {/* Drag & Drop Image Upload */}
       <div className="space-y-2">
-        <Label>Image URL</Label>
-        <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." />
+        <Label>Image</Label>
+        {imagePreview ? (
+          <div className="relative rounded-xl overflow-hidden border">
+            <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover" />
+            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-8 w-8 rounded-full" onClick={removeImage}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-8 cursor-pointer transition-colors ${
+              dragOver ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50"
+            }`}
+          >
+            {uploading ? (
+              <p className="text-sm text-muted-foreground animate-pulse">Uploading...</p>
+            ) : (
+              <>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium">Drop image here or click to browse</p>
+                  <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WebP · Max 5MB</p>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
       </div>
+
       <div className="space-y-2">
         <Label>Excerpt</Label>
         <Textarea value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} rows={2} placeholder="Short summary..." />
@@ -184,7 +246,7 @@ function NewsDialog({ article, onClose }: { article?: any; onClose: () => void }
         <Switch checked={form.is_published} onCheckedChange={(v) => setForm({ ...form, is_published: v })} />
         <Label>Publish immediately</Label>
       </div>
-      <Button type="submit" disabled={loading} className="w-full">
+      <Button type="submit" disabled={loading || uploading} className="w-full">
         {loading ? "Saving..." : isEdit ? "Update Article" : "Create Article"}
       </Button>
     </form>
