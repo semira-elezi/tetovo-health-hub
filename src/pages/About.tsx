@@ -1,48 +1,37 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Users, Clock, Award, Heart } from "lucide-react";
 import Layout from "@/components/layout/Layout";
+import { useTranslation } from "@/lib/i18n";
 
 export default function AboutPage() {
+  const { t } = useTranslation();
+
   return (
     <Layout>
-      {/* Hero */}
       <section className="relative h-[50vh] min-h-[400px] flex items-center">
-        <img
-          src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1400&q=80"
-          alt="Clinical Hospital Tetovo"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        <img src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1400&q=80" alt="Clinical Hospital Tetovo" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-foreground/70" />
         <div className="container relative z-10 text-center">
-          <h1 className="text-4xl font-extrabold text-white md:text-5xl">About Clinical Hospital Tetovo</h1>
-          <p className="mt-4 text-lg text-white/80">A legacy of medical excellence since 1974</p>
+          <h1 className="text-4xl font-extrabold text-white md:text-5xl">{t("about.heroTitle")}</h1>
+          <p className="mt-4 text-lg text-white/80">{t("about.heroSubtitle")}</p>
         </div>
       </section>
 
-      {/* Content */}
       <section className="py-24">
         <div className="container grid gap-12 lg:grid-cols-2">
           <div>
-            <p className="text-base leading-[1.7] text-muted-foreground">
-              PHI Clinical Hospital Tetovo is a Public Health Institution established by law with full rights and obligations set out by the collective agreement, statute, and other general acts.
-            </p>
-            <p className="mt-4 text-base leading-[1.7] text-muted-foreground">
-              Health care in a country is one of the important elements for preserving and improving the health of citizens. It protects the standard of living and social security, and is a significant factor for economic development.
-            </p>
-            <p className="mt-4 text-base leading-[1.7] text-muted-foreground">
-              With 31 specialized departments and over 300,000 patients treated per year, we serve the entire northwestern region of North Macedonia, including Tetovo, Gostivar, Kičevo, and surrounding municipalities.
-            </p>
+            <p className="text-base leading-[1.7] text-muted-foreground">{t("about.p1")}</p>
+            <p className="mt-4 text-base leading-[1.7] text-muted-foreground">{t("about.p2")}</p>
+            <p className="mt-4 text-base leading-[1.7] text-muted-foreground">{t("about.p3")}</p>
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             {[
-              { icon: Clock, value: "50+", label: "Years in service" },
-              { icon: Award, value: "31", label: "Departments" },
-              { icon: Users, value: "300,000+", label: "Patients per year" },
-              { icon: Heart, value: "24/7", label: "Emergency care" },
+              { icon: Clock, value: "50+", label: t("about.yearsService") },
+              { icon: Award, value: "31", label: t("about.departments") },
+              { icon: Users, value: "300,000+", label: t("about.patientsYear") },
+              { icon: Heart, value: "24/7", label: t("about.emergencyCare") },
             ].map((stat) => (
               <Card key={stat.label} className="rounded-2xl border shadow-card">
                 <CardContent className="p-6 text-center">
@@ -56,15 +45,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Management */}
       <section className="py-24 bg-secondary">
         <div className="container">
-          <h2 className="text-center text-3xl font-bold md:text-4xl">Hospital Management</h2>
+          <h2 className="text-center text-3xl font-bold md:text-4xl">{t("about.management")}</h2>
           <div className="mt-12 grid gap-6 sm:grid-cols-3">
             {[
-              { role: "Hospital Director" },
-              { role: "Deputy Director for Medical Affairs" },
-              { role: "Deputy Director for Economic Affairs" },
+              { role: t("about.director") },
+              { role: t("about.deputyMedical") },
+              { role: t("about.deputyEconomic") },
             ].map((person) => (
               <Card key={person.role} className="rounded-2xl border shadow-card">
                 <CardContent className="p-6 text-center">
@@ -80,12 +68,11 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Administration */}
       <section className="py-24">
         <div className="container">
-          <h2 className="text-center text-3xl font-bold md:text-4xl">Administration</h2>
+          <h2 className="text-center text-3xl font-bold md:text-4xl">{t("about.administration")}</h2>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
-            {["About Us", "Laws", "Management", "Administration"].map((item) => (
+            {[t("about.aboutUs"), t("about.laws"), t("footer.management"), t("footer.administration")].map((item) => (
               <Card key={item} className="card-hover rounded-2xl border shadow-card cursor-pointer">
                 <CardContent className="p-6 text-center">
                   <p className="font-semibold">{item}</p>
