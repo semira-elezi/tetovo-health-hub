@@ -39,7 +39,7 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/register" element={<Register />} />
-              <Route path="/portal" element={<PatientPortal />} />
+              <Route path="/portal" element={<Portal />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
