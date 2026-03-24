@@ -17,6 +17,13 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Portal from "./pages/Portal";
 import NotFound from "./pages/NotFound";
+import AdminAnalytics from "./pages/AdminAnalytics";
+import AdminAppointments from "./pages/AdminAppointments";
+import AdminFeedback from "./pages/AdminFeedback";
+import AdminDocuments from "./pages/AdminDocuments";
+import DoctorSchedule from "./pages/DoctorSchedule";
+import PatientAppointments from "./pages/PatientAppointments";
+import PublicInfo from "./pages/PublicInfo";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +47,13 @@ const App = () => (
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/register" element={<Register />} />
               <Route path="/portal" element={<Portal />} />
+              <Route path="/public-info" element={<PublicInfo />} />
+              <Route path="/admin/analytics" element={<AdminAnalytics />} />
+              <Route path="/admin/appointments" element={<AdminAppointments />} />
+              <Route path="/admin/feedback" element={<AdminFeedback />} />
+              <Route path="/admin/documents" element={<AdminDocuments />} />
+              <Route path="/doctor/schedule" element={<DoctorSchedule />} />
+              <Route path="/patient/appointments" element={<PatientAppointments />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

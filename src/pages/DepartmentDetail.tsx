@@ -1,14 +1,21 @@
 import { useParams, Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Phone, Mail, MapPin, Clock, ArrowRight, Stethoscope } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Phone, Mail, MapPin, Clock, ArrowRight, Stethoscope, Star } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { useDepartment, useDepartments } from "@/hooks/useDepartments";
 import { useTranslation } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 export default function DepartmentDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { t, language } = useTranslation();
+  const { user } = useAuth();
   const { data: dept, isLoading } = useDepartment(slug || "");
   const { data: allDepartments } = useDepartments();
 
@@ -74,6 +81,7 @@ export default function DepartmentDetail() {
               <TabsList className="w-full justify-start rounded-2xl">
                 <TabsTrigger value="overview">{t("departments.overview")}</TabsTrigger>
                 <TabsTrigger value="services">{t("departments.services")}</TabsTrigger>
+                <TabsTrigger value="reviews">Reviews</TabsTrigger>
                 <TabsTrigger value="contact">{t("footer.contact")}</TabsTrigger>
               </TabsList>
 
@@ -100,6 +108,10 @@ export default function DepartmentDetail() {
                     </ul>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="reviews" className="mt-6">
+                <DepartmentReviews departmentId={dept.id} isLoggedIn={!!user} />
               </TabsContent>
 
               <TabsContent value="contact" className="mt-6">
@@ -156,5 +168,100 @@ export default function DepartmentDetail() {
         </div>
       </div>
     </Layout>
+  );
+}
+
+function DepartmentReviews({ departmentId, isLoggedIn }: { departmentId: string; isLoggedIn: boolean }) {
+  const { data: reviews, isLoading } = useQuery({
+    queryKey: ["dept-reviews", departmentId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("feedback")
+        .select("rating, comment, is_anonymous, created_at, admin_response")
+        .eq("department_id", departmentId)
+        .eq("is_published", true)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const avgRating = reviews?.length ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : "0";
+  const starCounts = [5, 4, 3, 2, 1].map(s => ({
+    star: s,
+    count: reviews?.filter(r => r.rating === s).length || 0,
+    pct: reviews?.length ? ((reviews.filter(r => r.rating === s).length / reviews.length) * 100) : 0,
+  }));
+
+  if (isLoading) return <div className="space-y-3"><div className="h-20 bg-muted animate-pulse rounded-xl" /><div className="h-20 bg-muted animate-pulse rounded-xl" /></div>;
+
+  return (
+    <div className="space-y-6">
+      <Card className="rounded-2xl">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-4 mb-4">
+            <span className="text-3xl font-bold">{avgRating}</span>
+            <div>
+              <div className="flex">
+                {[1, 2, 3, 4, 5].map(n => (
+                  <Star key={n} className={`h-4 w-4 ${n <= Math.round(Number(avgRating)) ? "fill-amber-400 text-amber-400" : "text-muted"}`} />
+                ))}
+              </div>
+              <span className="text-sm text-muted-foreground">{reviews?.length || 0} reviews</span>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            {starCounts.map(s => (
+              <div key={s.star} className="flex items-center gap-2 text-sm">
+                <span className="w-3">{s.star}</span>
+                <Star className="h-3 w-3 text-amber-400" />
+                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-amber-400 rounded-full" style={{ width: `${s.pct}%` }} />
+                </div>
+                <span className="text-muted-foreground w-8 text-right">{s.count}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {!isLoggedIn && (
+        <Card className="rounded-2xl border-dashed">
+          <CardContent className="p-4 text-center text-sm text-muted-foreground">
+            <Link to="/auth/login" className="text-primary hover:underline">Log in</Link> to leave a review
+          </CardContent>
+        </Card>
+      )}
+
+      {reviews?.length === 0 ? (
+        <p className="text-center text-muted-foreground py-4">No reviews yet. Be the first!</p>
+      ) : (
+        <div className="space-y-3">
+          {reviews?.map((r, i) => (
+            <Card key={i} className="rounded-2xl">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map(n => (
+                      <Star key={n} className={`h-3.5 w-3.5 ${n <= r.rating ? "fill-amber-400 text-amber-400" : "text-muted"}`} />
+                    ))}
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {r.is_anonymous ? "Anonymous" : "Patient"} · {new Date(r.created_at).toLocaleDateString("en", { month: "short", year: "numeric" })}
+                  </span>
+                </div>
+                {r.comment && <p className="text-sm text-muted-foreground">{r.comment}</p>}
+                {r.admin_response && (
+                  <div className="mt-3 pl-3 border-l-2 border-primary/30">
+                    <p className="text-xs font-medium text-primary">Hospital Response</p>
+                    <p className="text-sm text-muted-foreground">{r.admin_response}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

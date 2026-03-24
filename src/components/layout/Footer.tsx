@@ -39,7 +39,7 @@ export default function Footer() {
             <div className="flex flex-col gap-2.5">
               {[
                 { label: t("footer.aboutUs"), to: "/about" },
-                { label: t("footer.laws"), to: "/about" },
+                { label: t("publicInfo.title"), to: "/public-info" },
                 { label: t("footer.management"), to: "/about" },
                 { label: t("footer.administration"), to: "/about" },
               ].map((item) => (
@@ -54,7 +54,7 @@ export default function Footer() {
           <div>
             <h4 className="mb-4 text-sm font-semibold">{t("footer.policies")}</h4>
             <div className="flex flex-col gap-2.5">
-              <Link to="/about" className="text-sm text-background/60 hover:text-background transition-colors">
+              <Link to="/public-info" className="text-sm text-background/60 hover:text-background transition-colors">
                 {t("footer.patientRights")}
               </Link>
               <a href="http://alodoktore.mk/" target="_blank" rel="noopener noreferrer" className="text-sm text-background/60 hover:text-background transition-colors">
