@@ -373,31 +373,40 @@ export type Database = {
       }
       feedback: {
         Row: {
+          admin_response: string | null
           comment: string | null
           created_at: string
           department_id: string | null
           id: string
           is_anonymous: boolean
+          is_published: boolean
           patient_id: string | null
           rating: number
+          status: string
         }
         Insert: {
+          admin_response?: string | null
           comment?: string | null
           created_at?: string
           department_id?: string | null
           id?: string
           is_anonymous?: boolean
+          is_published?: boolean
           patient_id?: string | null
           rating: number
+          status?: string
         }
         Update: {
+          admin_response?: string | null
           comment?: string | null
           created_at?: string
           department_id?: string | null
           id?: string
           is_anonymous?: boolean
+          is_published?: boolean
           patient_id?: string | null
           rating?: number
+          status?: string
         }
         Relationships: [
           {
