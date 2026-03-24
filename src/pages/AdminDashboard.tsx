@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Users, UserPlus, Activity, Building2, FileText, Calendar, Shield, Trash2, Newspaper, Plus, Pencil } from "lucide-react";
+import { Users, UserPlus, Activity, Building2, FileText, Calendar, Shield, Trash2, Newspaper, Plus, Pencil, Upload, X, ImageIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useDoctors } from "@/hooks/useDoctors";
