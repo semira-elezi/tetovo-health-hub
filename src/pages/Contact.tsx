@@ -122,7 +122,7 @@ export default function ContactPage() {
 
             <div className="relative rounded-2xl border overflow-hidden h-[400px]">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2960.5!2d20.9574!3d42.0076!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1353e6d6d7e4f2b7%3A0x6d3c2c1e8e8e8e8e!2sKlinichka%20Bolnica%20Tetovo!5e0!3m2!1sen!2smk!4v1700000000000"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2964.7681434001015!2d20.968494176464166!3d42.005251257443135!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1353f0eb258b787d%3A0x3df072eb32e452ed!2sClinical%20Center%20Tetovo!5e0!3m2!1sen!2smk!4v1774388550742!5m2!1sen!2smk"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
