@@ -7,12 +7,12 @@ import { useTranslation, Language } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
-  { to: "/", label: "Home" },
-  { to: "/about", label: "About" },
-  { to: "/departments", label: "Departments" },
-  { to: "/news", label: "News" },
-  { to: "/contact", label: "Contact" },
-];
+  { to: "/", labelKey: "nav.home" },
+  { to: "/about", labelKey: "nav.about" },
+  { to: "/departments", labelKey: "nav.departments" },
+  { to: "/news", labelKey: "nav.news" },
+  { to: "/contact", labelKey: "nav.contact" },
+] as const;
 
 const languages: { code: Language; label: string }[] = [
   { code: "mk", label: "MK" },
@@ -59,7 +59,7 @@ export default function Navbar() {
             </svg>
           </div>
           <span className="hidden text-sm font-bold text-foreground sm:inline-block">
-            Clinical Hospital Tetovo
+            {t("footer.hospitalName")}
           </span>
         </Link>
 
@@ -76,7 +76,7 @@ export default function Navbar() {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              {link.label}
+              {t(link.labelKey)}
             </Link>
           ))}
         </nav>
@@ -161,7 +161,7 @@ export default function Navbar() {
                     : "text-muted-foreground hover:bg-secondary"
                 )}
               >
-                {link.label}
+                {t(link.labelKey)}
               </Link>
             ))}
 
