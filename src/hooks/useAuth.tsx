@@ -23,7 +23,7 @@ interface AuthContextType {
   isStaff: boolean;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, meta?: { fullName?: string; phone?: string; dateOfBirth?: string }) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
