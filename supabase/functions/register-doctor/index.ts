@@ -11,6 +11,17 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const anonKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || Deno.env.get("SUPABASE_ANON_KEY");
+
+    if (!supabaseUrl || !serviceRoleKey || !anonKey) {
+      return new Response(JSON.stringify({ error: "Server config error", details: { hasUrl: !!supabaseUrl, hasKey: !!serviceRoleKey, hasAnon: !!anonKey } }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Verify the caller is an admin
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -20,11 +31,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
     // Verify caller is admin using their JWT
-    const callerClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!, {
+    const callerClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     });
     const { data: { user: caller } } = await callerClient.auth.getUser();
@@ -35,7 +43,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check admin role
+    // Check admin role using service role client
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
     const { data: roleData } = await adminClient
       .from("user_roles")
@@ -61,7 +69,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 1. Create auth user with admin API (auto-confirms email)
+    // 1. Create auth user (auto-confirms email)
     const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
       email,
       password,
@@ -78,16 +86,16 @@ Deno.serve(async (req) => {
 
     const userId = newUser.user.id;
 
-    // 2. Add doctor role (the trigger already added 'patient', so we add 'doctor' and remove 'patient')
+    // 2. Replace default 'patient' role with 'doctor'
     await adminClient.from("user_roles").delete().eq("user_id", userId).eq("role", "patient");
     await adminClient.from("user_roles").insert({ user_id: userId, role: "doctor" });
 
-    // 3. Update profile with phone
+    // 3. Update profile
     if (phone) {
       await adminClient.from("profiles").update({ phone }).eq("id", userId);
     }
 
-    // 4. Create doctor record linked to the auth user
+    // 4. Create doctor record linked to auth user
     const { data: doctor, error: doctorError } = await adminClient.from("doctors").insert({
       user_id: userId,
       full_name,
