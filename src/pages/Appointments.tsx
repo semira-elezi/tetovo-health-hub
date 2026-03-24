@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import Layout from "@/components/layout/Layout";
-import { allDepartments } from "./Departments";
+import { useDepartments } from "@/hooks/useDepartments";
 import { cn } from "@/lib/utils";
 
 const timeSlots = ["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
@@ -24,20 +24,23 @@ export default function AppointmentsPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
+  const { data: departments } = useDepartments();
 
-  const selectedDept = allDepartments.find((d) => d.slug === department);
+  const getName = (d: any) => {
+    if (language === "mk") return d.name_mk || d.name_en;
+    if (language === "sq") return d.name_sq || d.name_en;
+    return d.name_en;
+  };
+
+  const selectedDept = departments?.find((d) => d.slug === department);
   const doctors = selectedDept
-    ? [
-        "Dr. Marija Ivanovska",
-        "Dr. Ahmet Jashari",
-        "Dr. Elena Stojanova",
-      ]
+    ? ["Dr. Marija Ivanovska", "Dr. Ahmet Jashari", "Dr. Elena Stojanova"]
     : [];
 
   const handleConfirm = () => setStep(5);
 
   if (step === 5) {
-    const deptName = allDepartments.find((d) => d.slug === department)?.name || department;
+    const deptName = selectedDept ? getName(selectedDept) : department;
     return (
       <Layout>
         <div className="container max-w-lg py-20 text-center">
@@ -46,12 +49,12 @@ export default function AppointmentsPage() {
           <Card className="mt-6 text-left rounded-2xl border shadow-card">
             <CardContent className="pt-6 space-y-2 text-sm">
               <p><span className="font-medium">ID:</span> APT-{Math.random().toString(36).slice(2, 8).toUpperCase()}</p>
-              <p><span className="font-medium">Department:</span> {deptName}</p>
-              <p><span className="font-medium">Doctor:</span> {doctor}</p>
-              <p><span className="font-medium">Date:</span> {date?.toLocaleDateString()} {time}</p>
+              <p><span className="font-medium">{t("portal.department")}:</span> {deptName}</p>
+              <p><span className="font-medium">{t("portal.doctor")}:</span> {doctor}</p>
+              <p><span className="font-medium">{t("portal.date")}:</span> {date?.toLocaleDateString()} {time}</p>
             </CardContent>
           </Card>
-          <Button className="mt-6 rounded-full" onClick={() => setStep(1)}>New Appointment</Button>
+          <Button className="mt-6 rounded-full" onClick={() => setStep(1)}>{language === "mk" ? "Нов термин" : language === "sq" ? "Termin i ri" : "New Appointment"}</Button>
         </div>
       </Layout>
     );
@@ -76,12 +79,12 @@ export default function AppointmentsPage() {
                 <Select value={department} onValueChange={setDepartment}>
                   <SelectTrigger><SelectValue placeholder={t("appointments.selectDept")} /></SelectTrigger>
                   <SelectContent>
-                    {allDepartments.map((d) => (
-                      <SelectItem key={d.slug} value={d.slug}>{d.name}</SelectItem>
+                    {(departments || []).map((d) => (
+                      <SelectItem key={d.slug} value={d.slug}>{getName(d)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <Button disabled={!department} onClick={() => setStep(2)} className="w-full rounded-full">Next</Button>
+                <Button disabled={!department} onClick={() => setStep(2)} className="w-full rounded-full">{language === "mk" ? "Следно" : language === "sq" ? "Tjetër" : "Next"}</Button>
               </div>
             )}
 
@@ -97,8 +100,8 @@ export default function AppointmentsPage() {
                   </SelectContent>
                 </Select>
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(1)} className="flex-1 rounded-full">Back</Button>
-                  <Button disabled={!doctor} onClick={() => setStep(3)} className="flex-1 rounded-full">Next</Button>
+                  <Button variant="outline" onClick={() => setStep(1)} className="flex-1 rounded-full">{language === "mk" ? "Назад" : language === "sq" ? "Prapa" : "Back"}</Button>
+                  <Button disabled={!doctor} onClick={() => setStep(3)} className="flex-1 rounded-full">{language === "mk" ? "Следно" : language === "sq" ? "Tjetër" : "Next"}</Button>
                 </div>
               </div>
             )}
@@ -115,8 +118,8 @@ export default function AppointmentsPage() {
                   </div>
                 )}
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1 rounded-full">Back</Button>
-                  <Button disabled={!date || !time} onClick={() => setStep(4)} className="flex-1 rounded-full">Next</Button>
+                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1 rounded-full">{language === "mk" ? "Назад" : language === "sq" ? "Prapa" : "Back"}</Button>
+                  <Button disabled={!date || !time} onClick={() => setStep(4)} className="flex-1 rounded-full">{language === "mk" ? "Следно" : language === "sq" ? "Tjetër" : "Next"}</Button>
                 </div>
               </div>
             )}
@@ -124,12 +127,12 @@ export default function AppointmentsPage() {
             {step === 4 && (
               <div className="space-y-4">
                 <h3 className="font-semibold">{t("appointments.confirm")}</h3>
-                <Input placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} required className="rounded-xl" />
-                <Input placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} required className="rounded-xl" />
-                <Textarea placeholder="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} className="rounded-xl" />
+                <Input placeholder={t("auth.fullName")} value={name} onChange={(e) => setName(e.target.value)} required className="rounded-xl" />
+                <Input placeholder={t("auth.phone")} value={phone} onChange={(e) => setPhone(e.target.value)} required className="rounded-xl" />
+                <Textarea placeholder={t("appointments.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} className="rounded-xl" />
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1 rounded-full">Back</Button>
-                  <Button disabled={!name || !phone} onClick={handleConfirm} className="flex-1 rounded-full">Confirm</Button>
+                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1 rounded-full">{language === "mk" ? "Назад" : language === "sq" ? "Prapa" : "Back"}</Button>
+                  <Button disabled={!name || !phone} onClick={handleConfirm} className="flex-1 rounded-full">{t("appointments.confirm")}</Button>
                 </div>
               </div>
             )}
