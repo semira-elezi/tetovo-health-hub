@@ -120,13 +120,17 @@ export default function ContactPage() {
               </CardContent>
             </Card>
 
-            <div className="relative rounded-2xl border bg-muted h-[400px] flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="h-8 w-8 text-muted-foreground mx-auto" />
-                <a href="https://maps.app.goo.gl/sAVbfDznZ8d7CcgW6" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
-                  {t("contact.openMaps")} <ExternalLink className="h-3.5 w-3.5" />
-                </a>
-              </div>
+            <div className="relative rounded-2xl border overflow-hidden h-[400px]">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2960.5!2d20.9574!3d42.0076!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1353e6d6d7e4f2b7%3A0x6d3c2c1e8e8e8e8e!2sKlinichka%20Bolnica%20Tetovo!5e0!3m2!1sen!2smk!4v1700000000000"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Clinical Hospital Tetovo Location"
+              />
             </div>
           </div>
         </div>
