@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Phone } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, Phone, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTranslation, Language } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -22,8 +23,10 @@ const languages: { code: Language; label: string }[] = [
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { language, setLanguage } = useTranslation();
+  const { language, setLanguage, t } = useTranslation();
+  const { user, profile, isAdmin, isStaff, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -33,6 +36,11 @@ export default function Navbar() {
 
   const isActive = (path: string) =>
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <header
@@ -93,6 +101,29 @@ export default function Navbar() {
             ))}
           </div>
 
+          {/* Auth buttons */}
+          {user ? (
+            <div className="hidden sm:flex items-center gap-2">
+              <Link to="/portal">
+                <Button variant="ghost" size="sm" className="gap-1.5">
+                  <User className="h-4 w-4" />
+                  <span className="hidden lg:inline">{profile?.full_name || t("nav.portal")}</span>
+                </Button>
+              </Link>
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-1.5">
+                <LogOut className="h-4 w-4" />
+                <span className="hidden lg:inline">{t("nav.logout")}</span>
+              </Button>
+            </div>
+          ) : (
+            <Link to="/auth/login" className="hidden sm:block">
+              <Button variant="outline" size="sm" className="gap-1.5">
+                <LogIn className="h-4 w-4" />
+                {t("nav.login")}
+              </Button>
+            </Link>
+          )}
+
           {/* Phone */}
           <a
             href="tel:+38975200304"
@@ -133,6 +164,33 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+
+            {/* Mobile auth links */}
+            {user ? (
+              <>
+                <Link
+                  to="/portal"
+                  onClick={() => setMobileOpen(false)}
+                  className="px-4 py-3 text-base font-medium rounded-lg text-muted-foreground hover:bg-secondary"
+                >
+                  {t("nav.portal")}
+                </Link>
+                <button
+                  onClick={() => { handleSignOut(); setMobileOpen(false); }}
+                  className="px-4 py-3 text-left text-base font-medium rounded-lg text-muted-foreground hover:bg-secondary"
+                >
+                  {t("nav.logout")}
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/auth/login"
+                onClick={() => setMobileOpen(false)}
+                className="px-4 py-3 text-base font-medium rounded-lg text-primary hover:bg-secondary"
+              >
+                {t("nav.login")}
+              </Link>
+            )}
 
             <div className="mt-6 flex items-center gap-1 px-4">
               {languages.map((lang) => (
