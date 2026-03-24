@@ -23,7 +23,7 @@ interface AuthContextType {
   isStaff: boolean;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, meta?: { fullName?: string; phone?: string; dateOfBirth?: string }) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -89,15 +89,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error as Error | null };
   };
 
-  const signUp = async (email: string, password: string, fullName?: string) => {
-    const { error } = await supabase.auth.signUp({
+  const signUp = async (
+    email: string,
+    password: string,
+    meta?: { fullName?: string; phone?: string; dateOfBirth?: string }
+  ) => {
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: meta?.fullName },
         emailRedirectTo: window.location.origin,
       },
     });
+    if (!error && data.user && (meta?.phone || meta?.dateOfBirth)) {
+      await supabase
+        .from("profiles")
+        .update({
+          phone: meta.phone || null,
+          date_of_birth: meta.dateOfBirth || null,
+        })
+        .eq("id", data.user.id);
+    }
     return { error: error as Error | null };
   };
 
