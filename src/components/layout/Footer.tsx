@@ -3,7 +3,7 @@ import { Phone, Mail, MapPin, ExternalLink } from "lucide-react";
 import { useTranslation, Language } from "@/lib/i18n";
 
 export default function Footer() {
-  const { language, setLanguage } = useTranslation();
+  const { language, setLanguage, t } = useTranslation();
 
   return (
     <footer className="bg-foreground text-background">
@@ -18,26 +18,16 @@ export default function Footer() {
                   <path d="M3 7h10v2H3V7z" fill="white" />
                 </svg>
               </div>
-              <span className="text-sm font-bold">Clinical Hospital Tetovo</span>
+              <span className="text-sm font-bold">{t("footer.hospitalName")}</span>
             </div>
             <p className="text-sm text-background/60 leading-relaxed">
-              Public Health Institution — Tetovo, North Macedonia
+              {t("footer.institution")}
             </p>
             <div className="mt-4 flex items-center gap-3">
-              <a
-                href="https://www.facebook.com/KlinikaTetovo"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-background/60 hover:text-background transition-colors"
-              >
+              <a href="https://www.facebook.com/KlinikaTetovo" target="_blank" rel="noopener noreferrer" className="text-background/60 hover:text-background transition-colors">
                 <ExternalLink className="h-4 w-4" />
               </a>
-              <a
-                href="https://www.youtube.com/@clinicalhtetovo"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-background/60 hover:text-background transition-colors"
-              >
+              <a href="https://www.youtube.com/@clinicalhtetovo" target="_blank" rel="noopener noreferrer" className="text-background/60 hover:text-background transition-colors">
                 <ExternalLink className="h-4 w-4" />
               </a>
             </div>
@@ -45,15 +35,16 @@ export default function Footer() {
 
           {/* Column 2 — Information */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold">Information</h4>
+            <h4 className="mb-4 text-sm font-semibold">{t("footer.information")}</h4>
             <div className="flex flex-col gap-2.5">
-              {["About us", "Laws", "Management", "Administration"].map((item) => (
-                <Link
-                  key={item}
-                  to="/about"
-                  className="text-sm text-background/60 hover:text-background transition-colors"
-                >
-                  {item}
+              {[
+                { label: t("footer.aboutUs"), to: "/about" },
+                { label: t("footer.laws"), to: "/about" },
+                { label: t("footer.management"), to: "/about" },
+                { label: t("footer.administration"), to: "/about" },
+              ].map((item) => (
+                <Link key={item.label} to={item.to} className="text-sm text-background/60 hover:text-background transition-colors">
+                  {item.label}
                 </Link>
               ))}
             </div>
@@ -61,30 +52,30 @@ export default function Footer() {
 
           {/* Column 3 — Policies & Links */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold">Policies & Links</h4>
+            <h4 className="mb-4 text-sm font-semibold">{t("footer.policies")}</h4>
             <div className="flex flex-col gap-2.5">
               <Link to="/about" className="text-sm text-background/60 hover:text-background transition-colors">
-                Rights and obligations of patients
+                {t("footer.patientRights")}
               </Link>
               <a href="http://alodoktore.mk/" target="_blank" rel="noopener noreferrer" className="text-sm text-background/60 hover:text-background transition-colors">
                 Alo Doktore
               </a>
               <a href="https://msc.gov.mk/" target="_blank" rel="noopener noreferrer" className="text-sm text-background/60 hover:text-background transition-colors">
-                Medical Simulation Centre
+                {language === "mk" ? "Центар за медицинска симулација" : language === "sq" ? "Qendra e Simulimit Mjekësor" : "Medical Simulation Centre"}
               </a>
               <a href="https://vlada.mk/" target="_blank" rel="noopener noreferrer" className="text-sm text-background/60 hover:text-background transition-colors">
-                Government of North Macedonia
+                {language === "mk" ? "Влада на Северна Македонија" : language === "sq" ? "Qeveria e Maqedonisë së Veriut" : "Government of North Macedonia"}
               </a>
             </div>
           </div>
 
           {/* Column 4 — Contact */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold">Contact</h4>
+            <h4 className="mb-4 text-sm font-semibold">{t("footer.contact")}</h4>
             <div className="flex flex-col gap-3 text-sm text-background/60">
               <div className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
-                <span>st. 29 Noemvri bb, 1200 Tetovo</span>
+                <span>{language === "mk" ? "ул. 29 Ноември бб, 1200 Тетово" : language === "sq" ? "rr. 29 Nëntori bb, 1200 Tetovë" : "st. 29 Noemvri bb, 1200 Tetovo"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4 shrink-0" />
@@ -116,7 +107,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 border-t border-background/10 pt-6 text-center text-sm text-background/40">
-          © 2025 Clinical Hospital Tetovo. All rights reserved. Powered by Optimus Solutions.
+          {t("footer.rights")}
         </div>
       </div>
     </footer>
