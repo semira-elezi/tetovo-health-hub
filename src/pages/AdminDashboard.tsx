@@ -30,33 +30,42 @@ function AddDoctorDialog() {
     specialization: "",
     department_id: "",
     email: "",
+    password: "",
     phone: "",
     bio: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.full_name || !form.department_id) {
-      toast.error("Name and department are required");
+    if (!form.full_name || !form.department_id || !form.email || !form.password) {
+      toast.error("Name, department, email, and password are required");
+      return;
+    }
+    if (form.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
       return;
     }
     setLoading(true);
-    const { error } = await supabase.from("doctors").insert({
-      full_name: form.full_name,
-      title: form.title || null,
-      specialization: form.specialization || null,
-      department_id: form.department_id,
-      email: form.email || null,
-      phone: form.phone || null,
-      bio: form.bio || null,
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await supabase.functions.invoke("register-doctor", {
+      body: {
+        email: form.email,
+        password: form.password,
+        full_name: form.full_name,
+        title: form.title,
+        specialization: form.specialization,
+        department_id: form.department_id,
+        phone: form.phone,
+        bio: form.bio,
+      },
     });
     setLoading(false);
-    if (error) {
-      toast.error("Failed to add doctor: " + error.message);
+    if (res.error || res.data?.error) {
+      toast.error("Failed to add doctor: " + (res.data?.error || res.error?.message));
     } else {
-      toast.success("Doctor added successfully");
+      toast.success(`Doctor added! Login: ${form.email} / ${form.password}`);
       queryClient.invalidateQueries({ queryKey: ["doctors"] });
-      setForm({ full_name: "", title: "", specialization: "", department_id: "", email: "", phone: "", bio: "" });
+      setForm({ full_name: "", title: "", specialization: "", department_id: "", email: "", password: "", phone: "", bio: "" });
       setOpen(false);
     }
   };
@@ -103,9 +112,15 @@ function AddDoctorDialog() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Email</Label>
-              <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              <Label>Email *</Label>
+              <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="doctor@hospital.com" />
             </div>
+            <div className="space-y-2">
+              <Label>Password *</Label>
+              <Input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Min 6 characters" />
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>Phone</Label>
               <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
