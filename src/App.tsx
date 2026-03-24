@@ -15,7 +15,7 @@ import NewsDetail from "./pages/NewsDetail";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import PatientPortal from "./pages/PatientPortal";
+import Portal from "./pages/Portal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
