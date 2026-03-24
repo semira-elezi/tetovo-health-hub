@@ -125,8 +125,6 @@ function AddDoctorDialog() {
               <Label>Phone</Label>
               <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             </div>
-            <div className="space-y-2" />
-            </div>
           </div>
           <div className="space-y-2">
             <Label>Bio</Label>
