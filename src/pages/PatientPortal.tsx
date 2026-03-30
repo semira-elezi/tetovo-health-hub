@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, FileText, Download, User, Activity, Clock } from "lucide-react";
+import { Calendar, FileText, Download, User, Activity, Clock, FlaskConical } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Layout from "@/components/layout/Layout";
 import PatientTimeline from "@/components/features/timeline/PatientTimeline";
+import PatientLabResults from "@/components/features/lab/PatientLabResults";
 
 export default function PatientPortal() {
   const { t, language } = useTranslation();
@@ -198,27 +199,12 @@ export default function PatientPortal() {
             )}
 
             {tab === "lab" && (
-              <Card><CardHeader><CardTitle>{t("portal.labResults")}</CardTitle></CardHeader>
-                <CardContent>{labLoading ? (<p className="text-sm text-muted-foreground py-4 text-center">{t("common.loading")}</p>) : !labResults?.length ? (<p className="text-sm text-muted-foreground py-4 text-center">{t("portal.noLabResultsFound")}</p>) : (
-                  <>
-                    <div className="hidden md:block">
-                      <Table><TableHeader><TableRow><TableHead>{t("portal.date")}</TableHead><TableHead>{t("portal.test")}</TableHead><TableHead>{t("portal.result")}</TableHead><TableHead>{t("portal.reference")}</TableHead><TableHead>{t("portal.status")}</TableHead></TableRow></TableHeader>
-                        <TableBody>{labResults.map((r) => (<TableRow key={r.id}><TableCell>{new Date(r.created_at).toLocaleDateString()}</TableCell><TableCell>{r.test_name}</TableCell><TableCell>{r.result_value || "—"} {r.unit || ""}</TableCell><TableCell>{r.reference_range || "—"}</TableCell><TableCell><Badge variant={r.status === "completed" ? "default" : "secondary"}>{r.status}</Badge></TableCell></TableRow>))}</TableBody></Table>
-                    </div>
-                    <div className="space-y-3 md:hidden">
-                      {labResults.map((r) => (
-                        <div key={r.id} className="rounded-xl border p-4 space-y-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-semibold">{r.test_name}</span>
-                            <Badge variant={r.status === "completed" ? "default" : "secondary"}>{r.status}</Badge>
-                          </div>
-                          <p className="text-sm">{r.result_value || "—"} {r.unit || ""}</p>
-                          <p className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}</CardContent></Card>
+              <div>
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <FlaskConical className="h-5 w-5" /> {t("portal.labResults")}
+                </h2>
+                <PatientLabResults />
+              </div>
             )}
 
             {tab === "documents" && (
