@@ -1,0 +1,42 @@
+import { supabase } from "@/integrations/supabase/client";
+
+export async function fetchNotifications(userId: string) {
+  const { data, error } = await supabase
+    .from("notifications")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+  if (error) throw error;
+  return data;
+}
+
+export async function markNotificationRead(notificationId: string) {
+  const { error } = await supabase
+    .from("notifications")
+    .update({ is_read: true })
+    .eq("id", notificationId);
+  if (error) throw error;
+}
+
+export async function markAllNotificationsRead(userId: string) {
+  const { error } = await supabase
+    .from("notifications")
+    .update({ is_read: true })
+    .eq("user_id", userId)
+    .eq("is_read", false);
+  if (error) throw error;
+}
+
+export async function createNotification(input: {
+  user_id: string;
+  title: string;
+  message?: string;
+  type?: "appointment" | "lab_result" | "message" | "system" | "emergency";
+  link?: string;
+}) {
+  const { error } = await supabase
+    .from("notifications")
+    .insert(input);
+  if (error) throw error;
+}
