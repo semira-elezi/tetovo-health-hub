@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, FileText, Download, User, Activity } from "lucide-react";
+import { Calendar, FileText, Download, User, Activity, Clock } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Layout from "@/components/layout/Layout";
+import PatientTimeline from "@/components/features/timeline/PatientTimeline";
 
 export default function PatientPortal() {
   const { t, language } = useTranslation();
@@ -100,20 +101,39 @@ export default function PatientPortal() {
 
   if (tab === "profile") initForm();
 
+  const tabs = [
+    { key: "overview", icon: Activity, label: t("portal.overview") },
+    { key: "timeline", icon: Clock, label: language === "mk" ? "Временска линија" : language === "sq" ? "Kronologjia" : "Timeline" },
+    { key: "appointments", icon: Calendar, label: t("portal.appointments") },
+    { key: "lab", icon: FileText, label: t("portal.labResults") },
+    { key: "documents", icon: Download, label: t("portal.documents") },
+    { key: "profile", icon: User, label: t("portal.profile") },
+  ];
+
   return (
     <Layout>
-      <div className="container py-10">
+      <div className="container py-6 md:py-10">
         <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
-          <div className="space-y-1">
-            {[
-              { key: "overview", icon: Activity, label: t("portal.overview") },
-              { key: "appointments", icon: Calendar, label: t("portal.appointments") },
-              { key: "lab", icon: FileText, label: t("portal.labResults") },
-              { key: "documents", icon: Download, label: t("portal.documents") },
-              { key: "profile", icon: User, label: t("portal.profile") },
-            ].map((item) => (
+          {/* Desktop sidebar */}
+          <div className="hidden lg:block space-y-1">
+            {tabs.map((item) => (
               <Button key={item.key} variant={tab === item.key ? "secondary" : "ghost"} className="w-full justify-start gap-2" onClick={() => setTab(item.key)}>
                 <item.icon className="h-4 w-4" />{item.label}
+              </Button>
+            ))}
+          </div>
+
+          {/* Mobile bottom nav handled via horizontal scroll tabs */}
+          <div className="flex gap-1 overflow-x-auto pb-2 lg:hidden -mx-1 px-1">
+            {tabs.map((item) => (
+              <Button
+                key={item.key}
+                variant={tab === item.key ? "default" : "outline"}
+                size="sm"
+                className="shrink-0 gap-1.5 text-xs"
+                onClick={() => setTab(item.key)}
+              >
+                <item.icon className="h-3.5 w-3.5" />{item.label}
               </Button>
             ))}
           </div>
@@ -140,19 +160,64 @@ export default function PatientPortal() {
               </div>
             )}
 
+            {tab === "timeline" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{language === "mk" ? "Медицинска временска линија" : language === "sq" ? "Kronologjia mjekësore" : "Medical Timeline"}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <PatientTimeline />
+                </CardContent>
+              </Card>
+            )}
+
             {tab === "appointments" && (
               <Card><CardHeader><CardTitle>{t("portal.appointments")}</CardTitle></CardHeader>
                 <CardContent>{aptsLoading ? (<p className="text-sm text-muted-foreground py-4 text-center">{t("common.loading")}</p>) : !appointments?.length ? (<p className="text-sm text-muted-foreground py-4 text-center">{t("portal.noAppointmentsFound")}</p>) : (
-                  <Table><TableHeader><TableRow><TableHead>{t("portal.date")}</TableHead><TableHead>{t("portal.time")}</TableHead><TableHead>{t("portal.doctor")}</TableHead><TableHead>{t("portal.department")}</TableHead><TableHead>{t("portal.status")}</TableHead></TableRow></TableHeader>
-                    <TableBody>{appointments.map((a) => (<TableRow key={a.id}><TableCell>{a.appointment_date}</TableCell><TableCell>{a.start_time} - {a.end_time}</TableCell><TableCell>{(a as any).doctors?.title || ""} {(a as any).doctors?.full_name || "—"}</TableCell><TableCell>{getDeptName((a as any).departments)}</TableCell><TableCell>{getStatusBadge(a.status)}</TableCell></TableRow>))}</TableBody></Table>
+                  <>
+                    {/* Desktop table */}
+                    <div className="hidden md:block">
+                      <Table><TableHeader><TableRow><TableHead>{t("portal.date")}</TableHead><TableHead>{t("portal.time")}</TableHead><TableHead>{t("portal.doctor")}</TableHead><TableHead>{t("portal.department")}</TableHead><TableHead>{t("portal.status")}</TableHead></TableRow></TableHeader>
+                        <TableBody>{appointments.map((a) => (<TableRow key={a.id}><TableCell>{a.appointment_date}</TableCell><TableCell>{a.start_time} - {a.end_time}</TableCell><TableCell>{(a as any).doctors?.title || ""} {(a as any).doctors?.full_name || "—"}</TableCell><TableCell>{getDeptName((a as any).departments)}</TableCell><TableCell>{getStatusBadge(a.status)}</TableCell></TableRow>))}</TableBody></Table>
+                    </div>
+                    {/* Mobile cards */}
+                    <div className="space-y-3 md:hidden">
+                      {appointments.map((a) => (
+                        <div key={a.id} className="rounded-xl border p-4 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-semibold">{a.appointment_date}</span>
+                            {getStatusBadge(a.status)}
+                          </div>
+                          <p className="text-sm">{(a as any).doctors?.title || ""} {(a as any).doctors?.full_name || "—"}</p>
+                          <p className="text-xs text-muted-foreground">{getDeptName((a as any).departments)} · {a.start_time} - {a.end_time}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}</CardContent></Card>
             )}
 
             {tab === "lab" && (
               <Card><CardHeader><CardTitle>{t("portal.labResults")}</CardTitle></CardHeader>
                 <CardContent>{labLoading ? (<p className="text-sm text-muted-foreground py-4 text-center">{t("common.loading")}</p>) : !labResults?.length ? (<p className="text-sm text-muted-foreground py-4 text-center">{t("portal.noLabResultsFound")}</p>) : (
-                  <Table><TableHeader><TableRow><TableHead>{t("portal.date")}</TableHead><TableHead>{t("portal.test")}</TableHead><TableHead>{t("portal.result")}</TableHead><TableHead>{t("portal.reference")}</TableHead><TableHead>{t("portal.status")}</TableHead></TableRow></TableHeader>
-                    <TableBody>{labResults.map((r) => (<TableRow key={r.id}><TableCell>{new Date(r.created_at).toLocaleDateString()}</TableCell><TableCell>{r.test_name}</TableCell><TableCell>{r.result_value || "—"} {r.unit || ""}</TableCell><TableCell>{r.reference_range || "—"}</TableCell><TableCell><Badge variant={r.status === "completed" ? "default" : "secondary"}>{r.status}</Badge></TableCell></TableRow>))}</TableBody></Table>
+                  <>
+                    <div className="hidden md:block">
+                      <Table><TableHeader><TableRow><TableHead>{t("portal.date")}</TableHead><TableHead>{t("portal.test")}</TableHead><TableHead>{t("portal.result")}</TableHead><TableHead>{t("portal.reference")}</TableHead><TableHead>{t("portal.status")}</TableHead></TableRow></TableHeader>
+                        <TableBody>{labResults.map((r) => (<TableRow key={r.id}><TableCell>{new Date(r.created_at).toLocaleDateString()}</TableCell><TableCell>{r.test_name}</TableCell><TableCell>{r.result_value || "—"} {r.unit || ""}</TableCell><TableCell>{r.reference_range || "—"}</TableCell><TableCell><Badge variant={r.status === "completed" ? "default" : "secondary"}>{r.status}</Badge></TableCell></TableRow>))}</TableBody></Table>
+                    </div>
+                    <div className="space-y-3 md:hidden">
+                      {labResults.map((r) => (
+                        <div key={r.id} className="rounded-xl border p-4 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-semibold">{r.test_name}</span>
+                            <Badge variant={r.status === "completed" ? "default" : "secondary"}>{r.status}</Badge>
+                          </div>
+                          <p className="text-sm">{r.result_value || "—"} {r.unit || ""}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}</CardContent></Card>
             )}
 
@@ -160,7 +225,7 @@ export default function PatientPortal() {
               <Card><CardHeader><CardTitle>{t("portal.documents")}</CardTitle></CardHeader>
                 <CardContent>{docsLoading ? (<p className="text-sm text-muted-foreground py-4 text-center">{t("common.loading")}</p>) : !documents?.length ? (<p className="text-sm text-muted-foreground py-4 text-center">{t("portal.noDocuments")}</p>) : (
                   <div className="space-y-3">{documents.map((doc) => (
-                    <div key={doc.id} className="flex items-center justify-between rounded-lg border p-3">
+                    <div key={doc.id} className="flex items-center justify-between rounded-xl border p-4">
                       <div className="flex items-center gap-3"><FileText className="h-5 w-5 text-primary" /><div><p className="text-sm font-medium">{doc.title}</p><p className="text-xs text-muted-foreground">{new Date(doc.created_at).toLocaleDateString()} · {doc.category.replace("_", " ")}</p></div></div>
                       {doc.file_url && (<a href={doc.file_url} target="_blank" rel="noopener noreferrer"><Button variant="ghost" size="icon"><Download className="h-4 w-4" /></Button></a>)}
                     </div>

@@ -23,6 +23,8 @@ import AdminFeedback from "./pages/AdminFeedback";
 import AdminDocuments from "./pages/AdminDocuments";
 import DoctorSchedule from "./pages/DoctorSchedule";
 import PatientAppointments from "./pages/PatientAppointments";
+import SymptomChecker from "./pages/SymptomChecker";
+import Appointments from "./pages/Appointments";
 import PublicInfo from "./pages/PublicInfo";
 
 const queryClient = new QueryClient();
@@ -48,6 +50,8 @@ const App = () => (
               <Route path="/auth/register" element={<Register />} />
               <Route path="/portal" element={<Portal />} />
               <Route path="/public-info" element={<PublicInfo />} />
+              <Route path="/symptom-checker" element={<SymptomChecker />} />
+              <Route path="/appointments" element={<Appointments />} />
               <Route path="/admin/analytics" element={<AdminAnalytics />} />
               <Route path="/admin/appointments" element={<AdminAppointments />} />
               <Route path="/admin/feedback" element={<AdminFeedback />} />
