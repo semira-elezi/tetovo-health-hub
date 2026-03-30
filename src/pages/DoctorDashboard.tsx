@@ -216,80 +216,97 @@ export default function DoctorDashboard() {
           </CardContent></Card>
         </div>
 
-        {/* Filter bar */}
-        <div className="flex items-center gap-2 mb-4 flex-wrap">
-          <span className="text-sm font-medium text-muted-foreground mr-2">Filter:</span>
-          {[
-            { value: "all", label: "All" },
-            { value: "today", label: "Today" },
-            { value: "pending", label: "Pending" },
-            { value: "confirmed", label: "Confirmed" },
-            { value: "in_progress", label: "In Progress" },
-            { value: "completed", label: "Completed" },
-          ].map(f => (
-            <Button key={f.value} variant={filter === f.value ? "default" : "outline"} size="sm"
-              onClick={() => setFilter(f.value)} className="text-xs h-7">
-              {f.label}
-            </Button>
-          ))}
-        </div>
+        {/* Tabs: Appointments / Lab Results */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-4">
+          <TabsList>
+            <TabsTrigger value="appointments" className="gap-1.5">
+              <Calendar className="h-3.5 w-3.5" />Appointments
+            </TabsTrigger>
+            <TabsTrigger value="lab" className="gap-1.5">
+              <FlaskConical className="h-3.5 w-3.5" />Lab Results
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Appointment list */}
-        <div className="space-y-2">
-          {aptsLoading ? (
-            Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)
-          ) : filteredApts.length === 0 ? (
-            <Card><CardContent className="py-12 text-center text-muted-foreground">No appointments found</CardContent></Card>
-          ) : (
-            filteredApts.map(a => (
-              <Card key={a.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setSelectedApt(a)}>
-                <CardContent className="flex items-center gap-4 py-3 px-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted shrink-0">
-                    <User className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{getPatientName(a)}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {a.appointment_date} · {a.start_time?.slice(0, 5)} – {a.end_time?.slice(0, 5)}
-                      {(a as any).departments?.name_en && ` · ${(a as any).departments.name_en}`}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {/* Inline quick actions */}
-                    {a.status === "pending" && (
-                      <>
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600 hover:bg-green-50"
-                          onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "confirmed", label: "Confirm" }); }}>
-                          <Check className="h-4 w-4" />
-                        </Button>
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-red-600 hover:bg-red-50"
-                          onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "cancelled", label: "Reject" }); }}>
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                    {a.status === "confirmed" && isToday(parseISO(a.appointment_date)) && (
-                      <Button size="sm" variant="outline" className="h-7 text-xs gap-1"
-                        onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "in_progress", label: "Check In" }); }}>
-                        <Play className="h-3 w-3" />Check In
-                      </Button>
-                    )}
-                    {a.status === "in_progress" && (
-                      <Button size="sm" variant="outline" className="h-7 text-xs gap-1 text-green-600"
-                        onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "completed", label: "Check Out" }); }}>
-                        <CheckCircle className="h-3 w-3" />Check Out
-                      </Button>
-                    )}
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${STATUS_COLORS[a.status] || ""}`}>
-                      {a.status.replace("_", " ")}
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
+          <TabsContent value="appointments" className="mt-4">
+            {/* Filter bar */}
+            <div className="flex items-center gap-2 mb-4 flex-wrap">
+              <span className="text-sm font-medium text-muted-foreground mr-2">Filter:</span>
+              {[
+                { value: "all", label: "All" },
+                { value: "today", label: "Today" },
+                { value: "pending", label: "Pending" },
+                { value: "confirmed", label: "Confirmed" },
+                { value: "in_progress", label: "In Progress" },
+                { value: "completed", label: "Completed" },
+              ].map(f => (
+                <Button key={f.value} variant={filter === f.value ? "default" : "outline"} size="sm"
+                  onClick={() => setFilter(f.value)} className="text-xs h-7">
+                  {f.label}
+                </Button>
+              ))}
+            </div>
+
+            {/* Appointment list */}
+            <div className="space-y-2">
+              {aptsLoading ? (
+                Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)
+              ) : filteredApts.length === 0 ? (
+                <Card><CardContent className="py-12 text-center text-muted-foreground">No appointments found</CardContent></Card>
+              ) : (
+                filteredApts.map(a => (
+                  <Card key={a.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setSelectedApt(a)}>
+                    <CardContent className="flex items-center gap-4 py-3 px-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted shrink-0">
+                        <User className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{getPatientName(a)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {a.appointment_date} · {a.start_time?.slice(0, 5)} – {a.end_time?.slice(0, 5)}
+                          {(a as any).departments?.name_en && ` · ${(a as any).departments.name_en}`}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {a.status === "pending" && (
+                          <>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600 hover:bg-green-50"
+                              onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "confirmed", label: "Confirm" }); }}>
+                              <Check className="h-4 w-4" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-red-600 hover:bg-red-50"
+                              onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "cancelled", label: "Reject" }); }}>
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
+                        {a.status === "confirmed" && isToday(parseISO(a.appointment_date)) && (
+                          <Button size="sm" variant="outline" className="h-7 text-xs gap-1"
+                            onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "in_progress", label: "Check In" }); }}>
+                            <Play className="h-3 w-3" />Check In
+                          </Button>
+                        )}
+                        {a.status === "in_progress" && (
+                          <Button size="sm" variant="outline" className="h-7 text-xs gap-1 text-green-600"
+                            onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "completed", label: "Check Out" }); }}>
+                            <CheckCircle className="h-3 w-3" />Check Out
+                          </Button>
+                        )}
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${STATUS_COLORS[a.status] || ""}`}>
+                          {a.status.replace("_", " ")}
+                        </span>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="lab" className="mt-4">
+            {doctorRecord && <LabResultsPanel doctorId={doctorRecord.id} />}
+          </TabsContent>
+        </Tabs>
 
         {/* Detail Modal */}
         {selectedApt && (
