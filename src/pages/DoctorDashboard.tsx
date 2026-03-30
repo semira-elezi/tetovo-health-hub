@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Calendar, Users, FileText, Stethoscope, Check, X, Clock, Play,
-  CheckCircle, ChevronRight, Pill, User, Loader2
+  CheckCircle, ChevronRight, Pill, User, Loader2, FlaskConical
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -20,6 +20,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { createNotification } from "@/services/notificationService";
 import { createPrescription } from "@/services/prescriptionService";
 import Layout from "@/components/layout/Layout";
+import LabOrderDialog from "@/components/features/lab/LabOrderDialog";
+import LabResultsPanel from "@/components/features/lab/LabResultsPanel";
 import { toast } from "sonner";
 import { format, isToday, parseISO } from "date-fns";
 import { Navigate, Link } from "react-router-dom";
@@ -40,6 +42,8 @@ export default function DoctorDashboard() {
   const [confirmAction, setConfirmAction] = useState<{ id: string; action: string; label: string } | null>(null);
   const [rescheduleApt, setRescheduleApt] = useState<any>(null);
   const [prescriptionApt, setPrescriptionApt] = useState<any>(null);
+  const [labOrderApt, setLabOrderApt] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("appointments");
   const [filter, setFilter] = useState("all");
 
   const isDoctor = roles.includes("doctor") || roles.includes("admin");
@@ -212,80 +216,97 @@ export default function DoctorDashboard() {
           </CardContent></Card>
         </div>
 
-        {/* Filter bar */}
-        <div className="flex items-center gap-2 mb-4 flex-wrap">
-          <span className="text-sm font-medium text-muted-foreground mr-2">Filter:</span>
-          {[
-            { value: "all", label: "All" },
-            { value: "today", label: "Today" },
-            { value: "pending", label: "Pending" },
-            { value: "confirmed", label: "Confirmed" },
-            { value: "in_progress", label: "In Progress" },
-            { value: "completed", label: "Completed" },
-          ].map(f => (
-            <Button key={f.value} variant={filter === f.value ? "default" : "outline"} size="sm"
-              onClick={() => setFilter(f.value)} className="text-xs h-7">
-              {f.label}
-            </Button>
-          ))}
-        </div>
+        {/* Tabs: Appointments / Lab Results */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-4">
+          <TabsList>
+            <TabsTrigger value="appointments" className="gap-1.5">
+              <Calendar className="h-3.5 w-3.5" />Appointments
+            </TabsTrigger>
+            <TabsTrigger value="lab" className="gap-1.5">
+              <FlaskConical className="h-3.5 w-3.5" />Lab Results
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Appointment list */}
-        <div className="space-y-2">
-          {aptsLoading ? (
-            Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)
-          ) : filteredApts.length === 0 ? (
-            <Card><CardContent className="py-12 text-center text-muted-foreground">No appointments found</CardContent></Card>
-          ) : (
-            filteredApts.map(a => (
-              <Card key={a.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setSelectedApt(a)}>
-                <CardContent className="flex items-center gap-4 py-3 px-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted shrink-0">
-                    <User className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{getPatientName(a)}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {a.appointment_date} · {a.start_time?.slice(0, 5)} – {a.end_time?.slice(0, 5)}
-                      {(a as any).departments?.name_en && ` · ${(a as any).departments.name_en}`}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {/* Inline quick actions */}
-                    {a.status === "pending" && (
-                      <>
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600 hover:bg-green-50"
-                          onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "confirmed", label: "Confirm" }); }}>
-                          <Check className="h-4 w-4" />
-                        </Button>
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-red-600 hover:bg-red-50"
-                          onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "cancelled", label: "Reject" }); }}>
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                    {a.status === "confirmed" && isToday(parseISO(a.appointment_date)) && (
-                      <Button size="sm" variant="outline" className="h-7 text-xs gap-1"
-                        onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "in_progress", label: "Check In" }); }}>
-                        <Play className="h-3 w-3" />Check In
-                      </Button>
-                    )}
-                    {a.status === "in_progress" && (
-                      <Button size="sm" variant="outline" className="h-7 text-xs gap-1 text-green-600"
-                        onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "completed", label: "Check Out" }); }}>
-                        <CheckCircle className="h-3 w-3" />Check Out
-                      </Button>
-                    )}
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${STATUS_COLORS[a.status] || ""}`}>
-                      {a.status.replace("_", " ")}
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
+          <TabsContent value="appointments" className="mt-4">
+            {/* Filter bar */}
+            <div className="flex items-center gap-2 mb-4 flex-wrap">
+              <span className="text-sm font-medium text-muted-foreground mr-2">Filter:</span>
+              {[
+                { value: "all", label: "All" },
+                { value: "today", label: "Today" },
+                { value: "pending", label: "Pending" },
+                { value: "confirmed", label: "Confirmed" },
+                { value: "in_progress", label: "In Progress" },
+                { value: "completed", label: "Completed" },
+              ].map(f => (
+                <Button key={f.value} variant={filter === f.value ? "default" : "outline"} size="sm"
+                  onClick={() => setFilter(f.value)} className="text-xs h-7">
+                  {f.label}
+                </Button>
+              ))}
+            </div>
+
+            {/* Appointment list */}
+            <div className="space-y-2">
+              {aptsLoading ? (
+                Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)
+              ) : filteredApts.length === 0 ? (
+                <Card><CardContent className="py-12 text-center text-muted-foreground">No appointments found</CardContent></Card>
+              ) : (
+                filteredApts.map(a => (
+                  <Card key={a.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setSelectedApt(a)}>
+                    <CardContent className="flex items-center gap-4 py-3 px-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted shrink-0">
+                        <User className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{getPatientName(a)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {a.appointment_date} · {a.start_time?.slice(0, 5)} – {a.end_time?.slice(0, 5)}
+                          {(a as any).departments?.name_en && ` · ${(a as any).departments.name_en}`}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {a.status === "pending" && (
+                          <>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600 hover:bg-green-50"
+                              onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "confirmed", label: "Confirm" }); }}>
+                              <Check className="h-4 w-4" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-red-600 hover:bg-red-50"
+                              onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "cancelled", label: "Reject" }); }}>
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
+                        {a.status === "confirmed" && isToday(parseISO(a.appointment_date)) && (
+                          <Button size="sm" variant="outline" className="h-7 text-xs gap-1"
+                            onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "in_progress", label: "Check In" }); }}>
+                            <Play className="h-3 w-3" />Check In
+                          </Button>
+                        )}
+                        {a.status === "in_progress" && (
+                          <Button size="sm" variant="outline" className="h-7 text-xs gap-1 text-green-600"
+                            onClick={e => { e.stopPropagation(); setConfirmAction({ id: a.id, action: "completed", label: "Check Out" }); }}>
+                            <CheckCircle className="h-3 w-3" />Check Out
+                          </Button>
+                        )}
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${STATUS_COLORS[a.status] || ""}`}>
+                          {a.status.replace("_", " ")}
+                        </span>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="lab" className="mt-4">
+            {doctorRecord && <LabResultsPanel doctorId={doctorRecord.id} />}
+          </TabsContent>
+        </Tabs>
 
         {/* Detail Modal */}
         {selectedApt && (
@@ -296,6 +317,7 @@ export default function DoctorDashboard() {
               setSelectedApt(null);
               if (action === "reschedule") setRescheduleApt(selectedApt);
               else if (action === "prescribe") setPrescriptionApt(selectedApt);
+              else if (action === "lab_order") setLabOrderApt(selectedApt);
               else setConfirmAction({ id: selectedApt.id, action, label: action.replace("_", " ") });
             }}
           />
@@ -353,6 +375,16 @@ export default function DoctorDashboard() {
             appointment={prescriptionApt}
             doctorId={doctorRecord.id}
             onClose={() => setPrescriptionApt(null)}
+          />
+        )}
+
+        {/* Lab Order Dialog */}
+        {labOrderApt && doctorRecord && (
+          <LabOrderDialog
+            appointment={labOrderApt}
+            doctorId={doctorRecord.id}
+            onClose={() => setLabOrderApt(null)}
+            onSuccess={() => queryClient.invalidateQueries({ queryKey: ["doctor-lab-results-full"] })}
           />
         )}
       </div>
@@ -427,14 +459,24 @@ function AppointmentDetailModal({ appointment: a, onClose, onAction }: {
               </>
             )}
             {a.status === "in_progress" && (
-              <Button size="sm" className="gap-1 bg-green-600 hover:bg-green-700" onClick={() => onAction("completed")}>
-                <CheckCircle className="h-3.5 w-3.5" />Check Out
-              </Button>
+              <>
+                <Button size="sm" className="gap-1 bg-green-600 hover:bg-green-700" onClick={() => onAction("completed")}>
+                  <CheckCircle className="h-3.5 w-3.5" />Check Out
+                </Button>
+                <Button size="sm" variant="outline" className="gap-1" onClick={() => onAction("lab_order")}>
+                  <FlaskConical className="h-3.5 w-3.5" />Order Lab Test
+                </Button>
+              </>
             )}
             {a.status === "completed" && (
-              <Button size="sm" variant="outline" className="gap-1" onClick={() => onAction("prescribe")}>
-                <Pill className="h-3.5 w-3.5" />Write Prescription
-              </Button>
+              <>
+                <Button size="sm" variant="outline" className="gap-1" onClick={() => onAction("prescribe")}>
+                  <Pill className="h-3.5 w-3.5" />Write Prescription
+                </Button>
+                <Button size="sm" variant="outline" className="gap-1" onClick={() => onAction("lab_order")}>
+                  <FlaskConical className="h-3.5 w-3.5" />Order Lab Test
+                </Button>
+              </>
             )}
           </div>
         </div>
