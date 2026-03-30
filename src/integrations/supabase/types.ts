@@ -878,6 +878,7 @@ export type Database = {
         | "completed"
         | "cancelled"
         | "no_show"
+        | "in_progress"
       department_category:
         | "Surgery"
         | "Internal"
@@ -1047,6 +1048,7 @@ export const Constants = {
         "completed",
         "cancelled",
         "no_show",
+        "in_progress",
       ],
       department_category: [
         "Surgery",
