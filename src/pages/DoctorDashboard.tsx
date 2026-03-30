@@ -42,6 +42,8 @@ export default function DoctorDashboard() {
   const [confirmAction, setConfirmAction] = useState<{ id: string; action: string; label: string } | null>(null);
   const [rescheduleApt, setRescheduleApt] = useState<any>(null);
   const [prescriptionApt, setPrescriptionApt] = useState<any>(null);
+  const [labOrderApt, setLabOrderApt] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("appointments");
   const [filter, setFilter] = useState("all");
 
   const isDoctor = roles.includes("doctor") || roles.includes("admin");
