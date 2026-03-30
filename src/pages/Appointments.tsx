@@ -6,25 +6,38 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import Layout from "@/components/layout/Layout";
 import { useDepartments } from "@/hooks/useDepartments";
+import { useDoctors } from "@/hooks/useDoctors";
+import { useCreateAppointment } from "@/hooks/useAppointments";
+import { useAuth } from "@/hooks/useAuth";
+import { createNotification } from "@/services/notificationService";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const timeSlots = ["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
 
 export default function AppointmentsPage() {
   const { t, language } = useTranslation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [department, setDepartment] = useState("");
-  const [doctor, setDoctor] = useState("");
+  const [departmentSlug, setDepartmentSlug] = useState("");
+  const [doctorId, setDoctorId] = useState("");
   const [date, setDate] = useState<Date | undefined>();
   const [time, setTime] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
+  const [confirmedId, setConfirmedId] = useState("");
   const { data: departments } = useDepartments();
+
+  const selectedDept = departments?.find((d) => d.slug === departmentSlug);
+  const { data: doctors, isLoading: doctorsLoading } = useDoctors(selectedDept?.id);
+  const createAppointment = useCreateAppointment();
 
   const getName = (d: any) => {
     if (language === "mk") return d.name_mk || d.name_en;
@@ -32,15 +45,50 @@ export default function AppointmentsPage() {
     return d.name_en;
   };
 
-  const selectedDept = departments?.find((d) => d.slug === department);
-  const doctors = selectedDept
-    ? ["Dr. Marija Ivanovska", "Dr. Ahmet Jashari", "Dr. Elena Stojanova"]
-    : [];
+  const selectedDoctor = doctors?.find((d) => d.id === doctorId);
 
-  const handleConfirm = () => setStep(5);
+  const handleConfirm = async () => {
+    if (!user) {
+      toast.error(language === "mk" ? "Најавете се прво" : language === "sq" ? "Kyçuni fillimisht" : "Please log in first");
+      navigate("/login");
+      return;
+    }
+    if (!selectedDept || !doctorId || !date || !time) return;
+
+    const endHour = String(parseInt(time.split(":")[0]) + 1).padStart(2, "0");
+    const endTime = `${endHour}:00`;
+
+    try {
+      const result = await createAppointment.mutateAsync({
+        doctor_id: doctorId,
+        department_id: selectedDept.id,
+        appointment_date: date.toISOString().split("T")[0],
+        start_time: time,
+        end_time: endTime,
+        reason: notes || undefined,
+      });
+
+      setConfirmedId(result.id.slice(0, 8).toUpperCase());
+
+      // Notify the doctor
+      if (selectedDoctor?.user_id) {
+        await createNotification({
+          user_id: selectedDoctor.user_id,
+          title: "New Appointment Booked",
+          message: `A patient booked an appointment on ${date.toLocaleDateString()} at ${time}`,
+          type: "appointment",
+          link: "/doctor/dashboard",
+        }).catch(() => {});
+      }
+
+      setStep(5);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to book appointment");
+    }
+  };
 
   if (step === 5) {
-    const deptName = selectedDept ? getName(selectedDept) : department;
+    const deptName = selectedDept ? getName(selectedDept) : departmentSlug;
     return (
       <Layout>
         <div className="container max-w-lg py-20 text-center">
@@ -48,13 +96,15 @@ export default function AppointmentsPage() {
           <h2 className="mt-4 text-2xl font-bold">{t("appointments.success")}</h2>
           <Card className="mt-6 text-left rounded-2xl border shadow-card">
             <CardContent className="pt-6 space-y-2 text-sm">
-              <p><span className="font-medium">ID:</span> APT-{Math.random().toString(36).slice(2, 8).toUpperCase()}</p>
+              <p><span className="font-medium">ID:</span> APT-{confirmedId}</p>
               <p><span className="font-medium">{t("portal.department")}:</span> {deptName}</p>
-              <p><span className="font-medium">{t("portal.doctor")}:</span> {doctor}</p>
+              <p><span className="font-medium">{t("portal.doctor")}:</span> {selectedDoctor?.full_name}</p>
               <p><span className="font-medium">{t("portal.date")}:</span> {date?.toLocaleDateString()} {time}</p>
             </CardContent>
           </Card>
-          <Button className="mt-6 rounded-full" onClick={() => setStep(1)}>{language === "mk" ? "Нов термин" : language === "sq" ? "Termin i ri" : "New Appointment"}</Button>
+          <Button className="mt-6 rounded-full" onClick={() => { setStep(1); setDepartmentSlug(""); setDoctorId(""); setDate(undefined); setTime(""); setNotes(""); }}>
+            {language === "mk" ? "Нов термин" : language === "sq" ? "Termin i ri" : "New Appointment"}
+          </Button>
         </div>
       </Layout>
     );
@@ -76,7 +126,7 @@ export default function AppointmentsPage() {
             {step === 1 && (
               <div className="space-y-4">
                 <h3 className="font-semibold">{t("appointments.selectDept")}</h3>
-                <Select value={department} onValueChange={setDepartment}>
+                <Select value={departmentSlug} onValueChange={(v) => { setDepartmentSlug(v); setDoctorId(""); }}>
                   <SelectTrigger><SelectValue placeholder={t("appointments.selectDept")} /></SelectTrigger>
                   <SelectContent>
                     {(departments || []).map((d) => (
@@ -84,24 +134,37 @@ export default function AppointmentsPage() {
                     ))}
                   </SelectContent>
                 </Select>
-                <Button disabled={!department} onClick={() => setStep(2)} className="w-full rounded-full">{language === "mk" ? "Следно" : language === "sq" ? "Tjetër" : "Next"}</Button>
+                <Button disabled={!departmentSlug} onClick={() => setStep(2)} className="w-full rounded-full">
+                  {language === "mk" ? "Следно" : language === "sq" ? "Tjetër" : "Next"}
+                </Button>
               </div>
             )}
 
             {step === 2 && (
               <div className="space-y-4">
                 <h3 className="font-semibold">{t("appointments.selectDoctor")}</h3>
-                <Select value={doctor} onValueChange={setDoctor}>
-                  <SelectTrigger><SelectValue placeholder={t("appointments.selectDoctor")} /></SelectTrigger>
-                  <SelectContent>
-                    {doctors.map((d) => (
-                      <SelectItem key={d} value={d}>{d}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {doctorsLoading ? (
+                  <div className="flex justify-center py-4"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+                ) : (
+                  <Select value={doctorId} onValueChange={setDoctorId}>
+                    <SelectTrigger><SelectValue placeholder={t("appointments.selectDoctor")} /></SelectTrigger>
+                    <SelectContent>
+                      {(doctors || []).map((d) => (
+                        <SelectItem key={d.id} value={d.id}>
+                          {d.title ? `${d.title} ` : ""}{d.full_name}{d.specialization ? ` — ${d.specialization}` : ""}
+                        </SelectItem>
+                      ))}
+                      {doctors?.length === 0 && (
+                        <div className="px-2 py-4 text-sm text-muted-foreground text-center">
+                          {language === "mk" ? "Нема доктори" : language === "sq" ? "Nuk ka mjekë" : "No doctors available"}
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                )}
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setStep(1)} className="flex-1 rounded-full">{language === "mk" ? "Назад" : language === "sq" ? "Prapa" : "Back"}</Button>
-                  <Button disabled={!doctor} onClick={() => setStep(3)} className="flex-1 rounded-full">{language === "mk" ? "Следно" : language === "sq" ? "Tjetër" : "Next"}</Button>
+                  <Button disabled={!doctorId} onClick={() => setStep(3)} className="flex-1 rounded-full">{language === "mk" ? "Следно" : language === "sq" ? "Tjetër" : "Next"}</Button>
                 </div>
               </div>
             )}
@@ -132,7 +195,10 @@ export default function AppointmentsPage() {
                 <Textarea placeholder={t("appointments.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} className="rounded-xl" />
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setStep(3)} className="flex-1 rounded-full">{language === "mk" ? "Назад" : language === "sq" ? "Prapa" : "Back"}</Button>
-                  <Button disabled={!name || !phone} onClick={handleConfirm} className="flex-1 rounded-full">{t("appointments.confirm")}</Button>
+                  <Button disabled={!name || !phone || createAppointment.isPending} onClick={handleConfirm} className="flex-1 rounded-full">
+                    {createAppointment.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t("appointments.confirm")}
+                  </Button>
                 </div>
               </div>
             )}
