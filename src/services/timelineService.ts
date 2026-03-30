@@ -63,14 +63,27 @@ export async function fetchPatientTimeline(patientId: string): Promise<TimelineE
   });
 
   labRes.data?.forEach((l: any) => {
+    const labType = l.type || "manual";
+    const hasFile = !!l.file_url;
+    const hasSummary = !!l.summary;
+    
+    let description = l.result_value ? `${l.result_value} ${l.unit || ""}`.trim() : undefined;
+    if (hasFile && labType === "uploaded") description = "Document uploaded";
+    if (labType === "hybrid") description = `${description || ""} (+ document)`.trim();
+    
     events.push({
       id: l.id,
       type: "lab_result",
       title: l.test_name,
-      description: l.result_value ? `${l.result_value} ${l.unit || ""}`.trim() : undefined,
+      description,
       date: l.created_at.split("T")[0],
       status: l.status,
-      metadata: { doctor: l.doctors?.full_name },
+      metadata: { 
+        doctor: l.doctors?.full_name,
+        labType,
+        hasFile,
+        hasSummary,
+      },
     });
   });
 
