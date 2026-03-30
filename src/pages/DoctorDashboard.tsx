@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Calendar, Users, FileText, Stethoscope, Check, X, Clock, Play,
-  CheckCircle, ChevronRight, Pill, User, Loader2
+  CheckCircle, ChevronRight, Pill, User, Loader2, FlaskConical
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
