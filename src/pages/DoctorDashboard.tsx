@@ -20,6 +20,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { createNotification } from "@/services/notificationService";
 import { createPrescription } from "@/services/prescriptionService";
 import Layout from "@/components/layout/Layout";
+import LabOrderDialog from "@/components/features/lab/LabOrderDialog";
+import LabResultsPanel from "@/components/features/lab/LabResultsPanel";
 import { toast } from "sonner";
 import { format, isToday, parseISO } from "date-fns";
 import { Navigate, Link } from "react-router-dom";
