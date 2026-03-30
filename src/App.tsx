@@ -23,6 +23,8 @@ import AdminFeedback from "./pages/AdminFeedback";
 import AdminDocuments from "./pages/AdminDocuments";
 import DoctorSchedule from "./pages/DoctorSchedule";
 import PatientAppointments from "./pages/PatientAppointments";
+import SymptomChecker from "./pages/SymptomChecker";
+import Appointments from "./pages/Appointments";
 import PublicInfo from "./pages/PublicInfo";
 
 const queryClient = new QueryClient();
