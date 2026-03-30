@@ -459,14 +459,24 @@ function AppointmentDetailModal({ appointment: a, onClose, onAction }: {
               </>
             )}
             {a.status === "in_progress" && (
-              <Button size="sm" className="gap-1 bg-green-600 hover:bg-green-700" onClick={() => onAction("completed")}>
-                <CheckCircle className="h-3.5 w-3.5" />Check Out
-              </Button>
+              <>
+                <Button size="sm" className="gap-1 bg-green-600 hover:bg-green-700" onClick={() => onAction("completed")}>
+                  <CheckCircle className="h-3.5 w-3.5" />Check Out
+                </Button>
+                <Button size="sm" variant="outline" className="gap-1" onClick={() => onAction("lab_order")}>
+                  <FlaskConical className="h-3.5 w-3.5" />Order Lab Test
+                </Button>
+              </>
             )}
             {a.status === "completed" && (
-              <Button size="sm" variant="outline" className="gap-1" onClick={() => onAction("prescribe")}>
-                <Pill className="h-3.5 w-3.5" />Write Prescription
-              </Button>
+              <>
+                <Button size="sm" variant="outline" className="gap-1" onClick={() => onAction("prescribe")}>
+                  <Pill className="h-3.5 w-3.5" />Write Prescription
+                </Button>
+                <Button size="sm" variant="outline" className="gap-1" onClick={() => onAction("lab_order")}>
+                  <FlaskConical className="h-3.5 w-3.5" />Order Lab Test
+                </Button>
+              </>
             )}
           </div>
         </div>
