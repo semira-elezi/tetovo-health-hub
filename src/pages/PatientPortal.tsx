@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, FileText, Download, User, Activity, Clock } from "lucide-react";
+import { Calendar, FileText, Download, User, Activity, Clock, FlaskConical } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Layout from "@/components/layout/Layout";
 import PatientTimeline from "@/components/features/timeline/PatientTimeline";
+import PatientLabResults from "@/components/features/lab/PatientLabResults";
 
 export default function PatientPortal() {
   const { t, language } = useTranslation();
