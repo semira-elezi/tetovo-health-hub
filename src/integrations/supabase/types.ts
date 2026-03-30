@@ -423,14 +423,18 @@ export type Database = {
           appointment_id: string | null
           created_at: string
           doctor_id: string | null
+          file_type: string | null
+          file_url: string | null
           id: string
           notes: string | null
           patient_id: string
           reference_range: string | null
           result_value: string | null
           status: Database["public"]["Enums"]["lab_result_status"]
+          summary: string | null
           test_category: string | null
           test_name: string
+          type: string
           unit: string | null
           updated_at: string
         }
@@ -438,14 +442,18 @@ export type Database = {
           appointment_id?: string | null
           created_at?: string
           doctor_id?: string | null
+          file_type?: string | null
+          file_url?: string | null
           id?: string
           notes?: string | null
           patient_id: string
           reference_range?: string | null
           result_value?: string | null
           status?: Database["public"]["Enums"]["lab_result_status"]
+          summary?: string | null
           test_category?: string | null
           test_name: string
+          type?: string
           unit?: string | null
           updated_at?: string
         }
@@ -453,14 +461,18 @@ export type Database = {
           appointment_id?: string | null
           created_at?: string
           doctor_id?: string | null
+          file_type?: string | null
+          file_url?: string | null
           id?: string
           notes?: string | null
           patient_id?: string
           reference_range?: string | null
           result_value?: string | null
           status?: Database["public"]["Enums"]["lab_result_status"]
+          summary?: string | null
           test_category?: string | null
           test_name?: string
+          type?: string
           unit?: string | null
           updated_at?: string
         }
