@@ -317,6 +317,7 @@ export default function DoctorDashboard() {
               setSelectedApt(null);
               if (action === "reschedule") setRescheduleApt(selectedApt);
               else if (action === "prescribe") setPrescriptionApt(selectedApt);
+              else if (action === "lab_order") setLabOrderApt(selectedApt);
               else setConfirmAction({ id: selectedApt.id, action, label: action.replace("_", " ") });
             }}
           />
