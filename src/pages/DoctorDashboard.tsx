@@ -377,6 +377,16 @@ export default function DoctorDashboard() {
             onClose={() => setPrescriptionApt(null)}
           />
         )}
+
+        {/* Lab Order Dialog */}
+        {labOrderApt && doctorRecord && (
+          <LabOrderDialog
+            appointment={labOrderApt}
+            doctorId={doctorRecord.id}
+            onClose={() => setLabOrderApt(null)}
+            onSuccess={() => queryClient.invalidateQueries({ queryKey: ["doctor-lab-results-full"] })}
+          />
+        )}
       </div>
     </Layout>
   );
