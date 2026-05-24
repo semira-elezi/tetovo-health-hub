@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, FileText, Download, User, Activity, Clock, FlaskConical, HeartPulse, Bell, MessageSquare, Upload, ShieldCheck } from "lucide-react";
+import { Calendar, FileText, Download, User, Activity, Clock, FlaskConical, HeartPulse, Bell, Upload, ShieldCheck } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
@@ -17,7 +17,7 @@ import PatientHealthProfile from "@/components/features/patient/PatientHealthPro
 import PatientHealthMetrics from "@/components/features/patient/PatientHealthMetrics";
 import PatientMedicationReminders from "@/components/features/patient/PatientMedicationReminders";
 import PatientDocumentUpload from "@/components/features/patient/PatientDocumentUpload";
-import MessagesPanel from "@/components/features/messaging/MessagesPanel";
+
 import { exportAppointmentsPDF } from "@/lib/pdfExport";
 
 export default function PatientPortal() {
@@ -92,7 +92,7 @@ export default function PatientPortal() {
     { key: "meds", icon: Bell, label: language === "sq" ? "Kujtues" : language === "mk" ? "Потсетници" : "Reminders" },
     { key: "health-profile", icon: ShieldCheck, label: language === "sq" ? "Profili" : language === "mk" ? "Профил" : "Health Profile" },
     { key: "uploads", icon: Upload, label: language === "sq" ? "Dokumentet e mia" : language === "mk" ? "Документи" : "My Documents" },
-    { key: "messages", icon: MessageSquare, label: language === "sq" ? "Mesazhet" : language === "mk" ? "Пораки" : "Messages" },
+    
     { key: "profile", icon: User, label: t("portal.profile") },
   ];
 
@@ -176,7 +176,7 @@ export default function PatientPortal() {
             {tab === "meds" && <PatientMedicationReminders />}
             {tab === "health-profile" && <PatientHealthProfile />}
             {tab === "uploads" && <PatientDocumentUpload />}
-            {tab === "messages" && <MessagesPanel />}
+            
 
             {tab === "profile" && profileForm && (
               <Card><CardHeader><CardTitle>{t("portal.profile")}</CardTitle></CardHeader>
