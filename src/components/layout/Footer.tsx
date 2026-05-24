@@ -12,13 +12,8 @@ export default function Footer() {
           {/* Column 1 — Brand */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M7 3h2v10H7V3z" fill="white" />
-                  <path d="M3 7h10v2H3V7z" fill="white" />
-                </svg>
-              </div>
-              <span className="text-sm font-bold">{t("footer.hospitalName")}</span>
+              <img src="/logo.svg" alt="Clinical Hospital Tetovo" className="h-10 w-10 bg-background/10 rounded-md p-0.5" width={40} height={40} />
+              <span className="text-sm font-bold leading-tight">{t("footer.hospitalName")}</span>
             </div>
             <p className="text-sm text-background/60 leading-relaxed">
               {t("footer.institution")}
