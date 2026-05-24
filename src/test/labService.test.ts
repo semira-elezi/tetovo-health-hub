@@ -64,7 +64,7 @@ describe("labService", () => {
   });
 
   it("falls back when function returns no summary", async () => {
-    supabaseMock.functions.invoke.mockResolvedValueOnce({ data: {}, error: null });
+    supabaseMock.functions.invoke.mockResolvedValueOnce({ data: {} as any, error: null });
     const summary = await generateLabSummary("lab-2");
     expect(summary).toMatch(/could not be generated/i);
   });
