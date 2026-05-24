@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,79 +6,88 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 222 47% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 222 47% 9%;
 
-    --primary: 224 64% 33%;
+    --primary: 224 71% 28%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 20% 96%;
-    --secondary-foreground: 224 64% 20%;
+    --secondary: 220 18% 96%;
+    --secondary-foreground: 224 64% 18%;
 
-    --muted: 220 20% 96%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 220 16% 96%;
+    --muted-foreground: 220 9% 42%;
 
-    --accent: 217 91% 60%;
+    --accent: 217 91% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 20% 91%;
-    --input: 220 20% 91%;
-    --ring: 224 64% 33%;
+    --border: 220 14% 90%;
+    --input: 220 14% 90%;
+    --ring: 224 71% 28%;
 
-    --radius: 1rem;
+    --radius: 0.875rem;
 
-    --success: 142 72% 29%;
+    --success: 142 70% 36%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --sidebar-background: 220 20% 98%;
+    --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 224 64% 15%;
-    --sidebar-primary: 224 64% 33%;
+    --sidebar-primary: 224 71% 28%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 96%;
+    --sidebar-accent: 220 18% 96%;
     --sidebar-accent-foreground: 224 64% 20%;
-    --sidebar-border: 220 20% 91%;
-    --sidebar-ring: 224 64% 33%;
+    --sidebar-border: 220 14% 90%;
+    --sidebar-ring: 224 71% 28%;
   }
 
   .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 224 64% 45%;
+    --background: 222 47% 5%;
+    --foreground: 210 30% 96%;
+
+    --card: 222 40% 9%;
+    --card-foreground: 210 30% 96%;
+
+    --popover: 222 40% 9%;
+    --popover-foreground: 210 30% 96%;
+
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 224 30% 15%;
-    --secondary-foreground: 220 20% 96%;
-    --muted: 224 30% 15%;
-    --muted-foreground: 220 10% 60%;
+
+    --secondary: 222 30% 14%;
+    --secondary-foreground: 210 30% 96%;
+
+    --muted: 222 30% 14%;
+    --muted-foreground: 220 14% 70%;
+
     --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 62% 30%;
+
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 224 30% 18%;
-    --input: 224 30% 18%;
-    --ring: 224 64% 45%;
-    --sidebar-background: 224 64% 8%;
-    --sidebar-foreground: 220 20% 96%;
-    --sidebar-primary: 224 64% 45%;
+
+    --border: 222 30% 18%;
+    --input: 222 30% 18%;
+    --ring: 217 91% 60%;
+
+    --sidebar-background: 222 47% 7%;
+    --sidebar-foreground: 210 30% 96%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 224 30% 15%;
-    --sidebar-accent-foreground: 220 20% 96%;
-    --sidebar-border: 224 30% 18%;
-    --sidebar-ring: 224 64% 45%;
+    --sidebar-accent: 222 30% 14%;
+    --sidebar-accent-foreground: 210 30% 96%;
+    --sidebar-border: 222 30% 18%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
@@ -88,57 +97,53 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
+  h1, h2, h3, h4 { @apply tracking-tight; }
 }
 
 /* Animation keyframes */
 @keyframes fade-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes count-up-fade {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 @layer components {
-  .animate-hero {
-    animation: fade-slide-up 0.6s ease-out forwards;
-  }
-
-  .animate-hero-delay-1 {
-    opacity: 0;
-    animation: fade-slide-up 0.6s ease-out 0.15s forwards;
-  }
-
-  .animate-hero-delay-2 {
-    opacity: 0;
-    animation: fade-slide-up 0.6s ease-out 0.3s forwards;
-  }
-
-  .animate-hero-delay-3 {
-    opacity: 0;
-    animation: fade-slide-up 0.6s ease-out 0.45s forwards;
-  }
+  .animate-hero        { animation: fade-slide-up 0.55s ease-out forwards; }
+  .animate-hero-delay-1{ opacity: 0; animation: fade-slide-up 0.55s ease-out 0.1s forwards; }
+  .animate-hero-delay-2{ opacity: 0; animation: fade-slide-up 0.55s ease-out 0.2s forwards; }
+  .animate-hero-delay-3{ opacity: 0; animation: fade-slide-up 0.55s ease-out 0.3s forwards; }
 
   .card-hover {
     @apply transition-all duration-200 ease-out;
   }
   .card-hover:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: 0 10px 30px -12px hsl(var(--primary) / 0.25);
+  }
+  .dark .card-hover:hover {
+    box-shadow: 0 10px 30px -10px hsl(0 0% 0% / 0.6);
   }
 
-  .btn-press:active {
-    transform: scale(0.97);
+  .btn-press:active { transform: scale(0.97); }
+
+  /* Premium surface */
+  .surface {
+    @apply bg-card border border-border rounded-2xl;
   }
+  .surface-hover {
+    @apply transition-colors duration-150 hover:border-primary/40 hover:bg-accent/5;
+  }
+
+  /* Section spacing — tighter rhythm */
+  .section { @apply py-12 md:py-16; }
+  .section-tight { @apply py-8 md:py-12; }
 }
 
 @media print {

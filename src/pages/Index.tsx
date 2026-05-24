@@ -105,12 +105,12 @@ function StatsBar() {
   ];
 
   return (
-    <section className="bg-primary py-16">
-      <div className="container grid grid-cols-2 gap-8 md:grid-cols-4">
+    <section className="bg-primary py-10 md:py-12">
+      <div className="container grid grid-cols-2 gap-6 md:grid-cols-4">
         {stats.map((stat) => (
           <div key={stat.label} ref={stat.ref} className="text-center">
-            <p className="text-3xl font-extrabold text-primary-foreground md:text-4xl">{stat.value}</p>
-            <p className="mt-2 text-sm text-primary-foreground/70">{stat.label}</p>
+            <p className="text-2xl font-extrabold text-primary-foreground md:text-3xl">{stat.value}</p>
+            <p className="mt-1 text-xs md:text-sm text-primary-foreground/75">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -152,27 +152,27 @@ export default function HomePage() {
   return (
     <Layout>
       {/* ══════ HERO ══════ */}
-      <section className="py-16 md:py-24">
-        <div className="container grid items-center gap-12 lg:grid-cols-5">
+      <section className="py-10 md:py-16">
+        <div className="container grid items-center gap-10 lg:grid-cols-5">
           <div className="lg:col-span-3">
             <p className="animate-hero text-xs font-semibold uppercase tracking-widest text-accent">
               {t("hero.badge")}
             </p>
-            <h1 className="animate-hero-delay-1 mt-4 text-4xl font-extrabold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
+            <h1 className="animate-hero-delay-1 mt-3 text-3xl font-extrabold leading-[1.05] tracking-tight text-foreground md:text-5xl lg:text-6xl">
               {t("hero.title")}
             </h1>
-            <p className="animate-hero-delay-2 mt-5 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
+            <p className="animate-hero-delay-2 mt-4 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
               {t("hero.subtitle")}
             </p>
-            <div className="animate-hero-delay-3 mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button asChild size="lg" className="rounded-full px-8 py-3 btn-press">
+            <div className="animate-hero-delay-3 mt-6 flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg" className="rounded-full px-7 btn-press">
                 <Link to="/appointments">{t("hero.cta.appointment")}</Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="rounded-full px-8 py-3 btn-press">
+              <Button asChild variant="outline" size="lg" className="rounded-full px-7 btn-press">
                 <Link to="/departments">{t("hero.cta.departments")}</Link>
               </Button>
             </div>
-            <div className="animate-hero-delay-3 mt-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+            <div className="animate-hero-delay-3 mt-5 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-accent" /> {t("hero.24emergency")}</span>
               <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-accent" /> {t("hero.31depts")}</span>
               <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-accent" /> {t("hero.50years")}</span>
@@ -181,9 +181,9 @@ export default function HomePage() {
 
           <div className="relative lg:col-span-2 animate-hero-delay-2">
             <img src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=800&q=80" alt="Clinical Hospital Tetovo" className="w-full rounded-2xl object-cover aspect-[4/5]" width={800} height={1000} />
-            <div className="absolute -bottom-4 -left-4 rounded-2xl border bg-card p-5 shadow-card sm:bottom-6 sm:left-[-2rem]">
-              <p className="text-3xl font-extrabold text-primary">300,000+</p>
-              <p className="text-sm text-muted-foreground">{t("hero.patientsYear")}</p>
+            <div className="absolute -bottom-4 -left-4 rounded-2xl border bg-card p-4 shadow-card sm:bottom-6 sm:left-[-2rem]">
+              <p className="text-2xl font-extrabold text-primary">300,000+</p>
+              <p className="text-xs text-muted-foreground">{t("hero.patientsYear")}</p>
             </div>
           </div>
         </div>
@@ -192,28 +192,36 @@ export default function HomePage() {
       <StatsBar />
 
       {/* ══════ DEPARTMENTS ══════ */}
-      <section className="py-24">
+      <section className="py-12 md:py-16">
         <div className="container">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold md:text-4xl">{t("dept.ourDepartments")}</h2>
-            <p className="mt-3 text-muted-foreground">{t("dept.specializedCare")}</p>
+          <div className="flex items-end justify-between gap-4 flex-wrap">
+            <div>
+              <h2 className="text-2xl font-bold md:text-3xl">{t("dept.ourDepartments")}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{t("dept.specializedCare")}</p>
+            </div>
+            <Link to="/departments" className="text-sm font-medium text-primary hover:underline inline-flex items-center gap-1">
+              {t("dept.learnMore")} <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
-          <div ref={deptAnim.ref} className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div ref={deptAnim.ref} className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {departments.map((dept, i) => {
               const Icon = dept.icon;
               return (
-                <Card key={dept.slug} className="card-hover rounded-2xl border shadow-card overflow-hidden" style={{ opacity: deptAnim.visible ? 1 : 0, transform: deptAnim.visible ? "translateY(0)" : "translateY(20px)", transition: `opacity 0.4s ease ${i * 0.05}s, transform 0.4s ease ${i * 0.05}s` }}>
-                  <CardContent className="p-6">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
-                      <Icon className="h-6 w-6 text-accent" />
-                    </div>
-                    <h3 className="mt-4 text-lg font-semibold">{t(dept.nameKey as any)}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{t(dept.descKey as any)}</p>
-                    <Link to={`/departments/${dept.slug}`} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-                      {t("dept.learnMore")} <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
-                  </CardContent>
-                </Card>
+                <Link
+                  key={dept.slug}
+                  to={`/departments/${dept.slug}`}
+                  className="group block surface surface-hover p-5 card-hover"
+                  style={{ opacity: deptAnim.visible ? 1 : 0, transform: deptAnim.visible ? "translateY(0)" : "translateY(16px)", transition: `opacity 0.4s ease ${i * 0.05}s, transform 0.4s ease ${i * 0.05}s` }}
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-3 text-base font-semibold">{t(dept.nameKey as any)}</h3>
+                  <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed line-clamp-2">{t(dept.descKey as any)}</p>
+                  <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary">
+                    {t("dept.learnMore")} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                  </span>
+                </Link>
               );
             })}
           </div>
@@ -221,19 +229,19 @@ export default function HomePage() {
       </section>
 
       {/* ══════ ABOUT ══════ */}
-      <section className="py-24 bg-secondary">
-        <div className="container grid gap-12 lg:grid-cols-2">
-          <div className="grid grid-cols-2 gap-4">
-            <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&q=80" alt="Hospital exterior" className="rounded-2xl object-cover w-full h-48 lg:h-56" loading="lazy" />
-            <img src="https://images.unsplash.com/photo-1504813184591-01572f98c85f?w=600&q=80" alt="Hospital hallway" className="rounded-2xl object-cover w-full h-48 lg:h-56" loading="lazy" />
-            <img src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=600&q=80" alt="Operating room" className="rounded-2xl object-cover w-full h-48 lg:h-56" loading="lazy" />
-            <img src="https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=600&q=80" alt="Doctor with patient" className="rounded-2xl object-cover w-full h-48 lg:h-56" loading="lazy" />
+      <section className="py-12 md:py-16 bg-secondary">
+        <div className="container grid gap-10 lg:grid-cols-2">
+          <div className="grid grid-cols-2 gap-3">
+            <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&q=80" alt="Hospital exterior" className="rounded-xl object-cover w-full h-40 lg:h-52" loading="lazy" />
+            <img src="https://images.unsplash.com/photo-1504813184591-01572f98c85f?w=600&q=80" alt="Hospital hallway" className="rounded-xl object-cover w-full h-40 lg:h-52" loading="lazy" />
+            <img src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=600&q=80" alt="Operating room" className="rounded-xl object-cover w-full h-40 lg:h-52" loading="lazy" />
+            <img src="https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=600&q=80" alt="Doctor with patient" className="rounded-xl object-cover w-full h-40 lg:h-52" loading="lazy" />
           </div>
           <div className="flex flex-col justify-center">
             <p className="text-xs font-semibold uppercase tracking-widest text-accent">{t("about.badge")}</p>
-            <h2 className="mt-3 text-3xl font-bold md:text-4xl">{t("about.title")}</h2>
-            <p className="mt-5 text-base leading-relaxed text-muted-foreground">{t("about.description")}</p>
-            <Button asChild variant="outline" size="lg" className="mt-8 w-fit rounded-full px-8 btn-press">
+            <h2 className="mt-2 text-2xl font-bold md:text-3xl">{t("about.title")}</h2>
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground">{t("about.description")}</p>
+            <Button asChild variant="outline" size="lg" className="mt-6 w-fit rounded-full px-7 btn-press">
               <Link to="/about">{t("about.moreAbout")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </div>
@@ -241,26 +249,26 @@ export default function HomePage() {
       </section>
 
       {/* ══════ PUBLIC INFORMATION ══════ */}
-      <section className="py-24 bg-muted">
+      <section className="py-12 md:py-16">
         <div className="container">
           <div className="text-center">
-            <h2 className="text-3xl font-bold md:text-4xl">{t("publicInfo.title")}</h2>
-            <p className="mt-3 max-w-2xl mx-auto text-muted-foreground">{t("publicInfo.description")}</p>
+            <h2 className="text-2xl font-bold md:text-3xl">{t("publicInfo.title")}</h2>
+            <p className="mt-2 max-w-2xl mx-auto text-sm text-muted-foreground">{t("publicInfo.description")}</p>
           </div>
-          <div className="mt-12 grid gap-4 grid-cols-2 md:grid-cols-4">
+          <div className="mt-8 grid gap-3 grid-cols-2 md:grid-cols-4">
             {publicInfoItems.map((item) => {
               const count = (procurementDocs || []).filter((d: any) => d.category === item.key).length;
               return (
-                <Link key={item.key} to="/public-info">
-                  <Card className="card-hover rounded-2xl border shadow-card cursor-pointer h-full">
-                    <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
-                      <FileText className="h-8 w-8 text-primary" />
-                      <p className="text-sm font-semibold">{item.label}</p>
-                      <Badge variant="outline" className="rounded-full text-xs">
-                        {count} {language === "mk" ? "документи" : language === "sq" ? "dokumente" : "documents"}
-                      </Badge>
-                    </CardContent>
-                  </Card>
+                <Link
+                  key={item.key}
+                  to={`/public-info?cat=${item.key}`}
+                  className="surface surface-hover card-hover p-5 flex flex-col items-center gap-2.5 text-center"
+                >
+                  <FileText className="h-7 w-7 text-primary" />
+                  <p className="text-sm font-semibold leading-snug">{item.label}</p>
+                  <Badge variant="outline" className="rounded-full text-[11px] font-medium">
+                    {count} {language === "mk" ? "док." : language === "sq" ? "dok." : "docs"}
+                  </Badge>
                 </Link>
               );
             })}
@@ -269,65 +277,70 @@ export default function HomePage() {
       </section>
 
       {/* ══════ NEWS ══════ */}
-      <section className="py-24">
+      <section className="py-12 md:py-16 bg-muted/40">
         <div className="container">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold md:text-4xl">{t("news.title")}</h2>
+          <div className="flex items-end justify-between gap-4 flex-wrap">
+            <h2 className="text-2xl font-bold md:text-3xl">{t("news.title")}</h2>
+            <Link to="/news" className="text-sm font-medium text-primary hover:underline inline-flex items-center gap-1">
+              {t("news.readMore")} <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {(latestNews || []).slice(0, 3).map((item: any) => {
               const catKey = item.category === "hospital_news" ? "news.hospital" : item.category === "health_tips" ? "news.healthTips" : item.category === "events" ? "news.events" : "news.announcements";
               return (
-                <Card key={item.id} className="card-hover rounded-2xl border shadow-card overflow-hidden">
+                <Link
+                  key={item.id}
+                  to={`/news/${item.slug}`}
+                  className="group block surface surface-hover card-hover overflow-hidden"
+                >
                   {item.image_url && (
-                    <img src={item.image_url} alt={item.title} className="h-48 w-full object-cover" loading="lazy" />
+                    <img src={item.image_url} alt={item.title} className="h-44 w-full object-cover transition-transform group-hover:scale-105" loading="lazy" />
                   )}
-                  <CardContent className="p-5">
+                  <div className="p-4">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">
-                        {item.published_at ? format(new Date(item.published_at), "MMMM d, yyyy") : ""}
+                      <span className="text-[11px] text-muted-foreground">
+                        {item.published_at ? format(new Date(item.published_at), "MMM d, yyyy") : ""}
                       </span>
-                      <Badge className="rounded-full bg-accent text-accent-foreground text-xs px-2.5 py-0.5">{t(catKey as any)}</Badge>
+                      <Badge className="rounded-full bg-accent text-accent-foreground text-[10px] px-2 py-0">{t(catKey as any)}</Badge>
                     </div>
-                    <h3 className="mt-3 text-base font-semibold leading-snug">{item.title}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed line-clamp-2">{item.excerpt}</p>
-                    <Link to={`/news/${item.slug}`} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-                      {t("news.readMore")} <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
-                  </CardContent>
-                </Card>
+                    <h3 className="mt-2 text-sm font-semibold leading-snug line-clamp-2">{item.title}</h3>
+                    <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed line-clamp-2">{item.excerpt}</p>
+                    <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary">
+                      {t("news.readMore")} <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  </div>
+                </Link>
               );
             })}
             {latestNews && latestNews.length === 0 && (
-              <p className="col-span-full text-center text-muted-foreground">{language === "mk" ? "Нема вести" : language === "sq" ? "Nuk ka lajme" : "No news yet"}</p>
+              <p className="col-span-full text-center text-sm text-muted-foreground">{language === "mk" ? "Нема вести" : language === "sq" ? "Nuk ka lajme" : "No news yet"}</p>
             )}
           </div>
         </div>
       </section>
 
       {/* ══════ PARTNERS ══════ */}
-      <section className="py-16 bg-secondary">
+      <section className="py-10 md:py-12">
         <div className="container">
-          <h3 className="text-center text-lg font-semibold mb-8">{t("partners.title")}</h3>
-          <div className="flex flex-wrap items-center justify-center gap-4">
+          <h3 className="text-center text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-6">{t("partners.title")}</h3>
+          <div className="flex flex-wrap items-center justify-center gap-3">
             {partners.map((p) => (
-              <a key={p.nameKey} href={p.url} target="_blank" rel="noopener noreferrer" className="card-hover flex items-center gap-2 rounded-2xl border bg-card px-6 py-4 text-sm font-medium shadow-card">
-                <ExternalLink className="h-4 w-4 text-primary" />
+              <a key={p.nameKey} href={p.url} target="_blank" rel="noopener noreferrer"
+                className="surface surface-hover card-hover flex items-center gap-2 px-4 py-2.5 text-sm font-medium">
+                <ExternalLink className="h-3.5 w-3.5 text-primary" />
                 {getLocalName(p.name)}
               </a>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ══════ USEFUL LINKS ══════ */}
-      <section className="py-12">
-        <div className="container flex flex-wrap items-center justify-center gap-6">
-          {usefulLinks.map((link) => (
-            <a key={typeof link.name === "string" ? link.name : link.name.en} href={link.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-primary hover:underline">
-              {getLocalName(link.name)}
-            </a>
-          ))}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+            {usefulLinks.map((link) => (
+              <a key={typeof link.name === "string" ? link.name : link.name.en} href={link.url} target="_blank" rel="noopener noreferrer"
+                className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors">
+                {getLocalName(link.name)}
+              </a>
+            ))}
+          </div>
         </div>
       </section>
     </Layout>

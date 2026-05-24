@@ -7,8 +7,8 @@ export default function Footer() {
 
   return (
     <footer className="bg-foreground text-background">
-      <div className="container py-16">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="container py-10 md:py-12">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {/* Column 1 — Brand */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">
@@ -99,7 +99,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-background/10 pt-6 text-center text-sm text-background/40">
+        <div className="mt-8 border-t border-background/10 pt-5 text-center text-xs text-background/50">
           {t("footer.rights")}
         </div>
       </div>
