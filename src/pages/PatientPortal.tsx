@@ -98,42 +98,60 @@ export default function PatientPortal() {
 
   return (
     <Layout>
-      <div className="container py-6 md:py-10">
-        <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
-          <div className="hidden lg:block space-y-1">
-            {tabs.map((item) => (
-              <Button key={item.key} variant={tab === item.key ? "secondary" : "ghost"} className="w-full justify-start gap-2" onClick={() => setTab(item.key)}>
-                <item.icon className="h-4 w-4" />{item.label}
-              </Button>
-            ))}
-          </div>
+      <div className="container py-5 md:py-8">
+        <div className="mb-4 md:mb-6">
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight">
+            {t("portal.welcome")}, <span className="text-primary">{profile?.full_name?.split(" ")[0] || user?.email}</span>
+          </h1>
+          <p className="text-sm text-muted-foreground">{t("portal.healthOverview")}</p>
+        </div>
 
-          <div className="flex gap-1 overflow-x-auto pb-2 lg:hidden -mx-1 px-1">
+        <div className="grid gap-5 lg:grid-cols-[220px_1fr]">
+          <aside className="hidden lg:block">
+            <div className="sticky top-20 surface p-2 space-y-0.5">
+              {tabs.map((item) => (
+                <button
+                  key={item.key}
+                  onClick={() => setTab(item.key)}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-left ${
+                    tab === item.key
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-foreground/75 hover:bg-accent/10 hover:text-foreground"
+                  }`}
+                >
+                  <item.icon className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </aside>
+
+          <div className="flex gap-1.5 overflow-x-auto pb-2 lg:hidden -mx-1 px-1 snap-x">
             {tabs.map((item) => (
-              <Button key={item.key} variant={tab === item.key ? "default" : "outline"} size="sm"
-                className="shrink-0 gap-1.5 text-xs" onClick={() => setTab(item.key)}>
+              <button key={item.key} onClick={() => setTab(item.key)}
+                className={`shrink-0 snap-start inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                  tab === item.key
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card text-foreground/75 border-border hover:border-primary/40"
+                }`}>
                 <item.icon className="h-3.5 w-3.5" />{item.label}
-              </Button>
+              </button>
             ))}
           </div>
 
-          <div>
+          <div className="min-w-0">
             {tab === "overview" && (
               <div className="space-y-4">
-                <Card><CardContent className="pt-6">
-                  <h2 className="text-xl font-bold">{t("portal.welcome")}, {profile?.full_name || user?.email}</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">{t("portal.healthOverview")}</p>
-                </CardContent></Card>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Card><CardHeader><CardTitle className="text-sm">{t("portal.nextAppointment")}</CardTitle></CardHeader>
-                    <CardContent>{nextAppointment ? (<><p className="text-lg font-semibold">{nextAppointment.appointment_date} {nextAppointment.start_time}</p><p className="text-sm text-muted-foreground">{(nextAppointment as any).doctors?.title || ""} {(nextAppointment as any).doctors?.full_name} · {getDeptName((nextAppointment as any).departments)}</p></>) : (<p className="text-sm text-muted-foreground">{t("portal.noAppointments")}</p>)}</CardContent></Card>
-                  <Card><CardHeader><CardTitle className="text-sm">{t("portal.labResults")}</CardTitle></CardHeader>
-                    <CardContent>{latestLab ? (<><p className="text-lg font-semibold">{latestLab.test_name}</p><Badge variant="secondary" className="mt-1">{latestLab.status}</Badge></>) : (<p className="text-sm text-muted-foreground">{t("portal.noLabResults")}</p>)}</CardContent></Card>
+                  <Card className="surface"><CardHeader className="pb-2"><CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("portal.nextAppointment")}</CardTitle></CardHeader>
+                    <CardContent>{nextAppointment ? (<><p className="text-base font-semibold">{nextAppointment.appointment_date} · {nextAppointment.start_time}</p><p className="text-xs text-muted-foreground mt-1">{(nextAppointment as any).doctors?.title || ""} {(nextAppointment as any).doctors?.full_name} · {getDeptName((nextAppointment as any).departments)}</p></>) : (<p className="text-sm text-muted-foreground">{t("portal.noAppointments")}</p>)}</CardContent></Card>
+                  <Card className="surface"><CardHeader className="pb-2"><CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("portal.labResults")}</CardTitle></CardHeader>
+                    <CardContent>{latestLab ? (<><p className="text-base font-semibold">{latestLab.test_name}</p><Badge variant="secondary" className="mt-1">{latestLab.status}</Badge></>) : (<p className="text-sm text-muted-foreground">{t("portal.noLabResults")}</p>)}</CardContent></Card>
                 </div>
                 {prescriptions && prescriptions.filter((p) => p.status === "active").length > 0 && (
-                  <Card><CardHeader><CardTitle className="text-sm">{t("portal.activePrescriptions")}</CardTitle></CardHeader>
+                  <Card className="surface"><CardHeader className="pb-2"><CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("portal.activePrescriptions")}</CardTitle></CardHeader>
                     <CardContent><div className="space-y-2">{prescriptions.filter((p) => p.status === "active").map((p) => (
-                      <div key={p.id} className="flex items-center justify-between text-sm"><span className="font-medium">{p.medication_name}</span><span className="text-muted-foreground">{p.dosage} · {p.frequency}</span></div>
+                      <div key={p.id} className="flex items-center justify-between text-sm py-1.5 border-b last:border-0 border-border/50"><span className="font-medium">{p.medication_name}</span><span className="text-xs text-muted-foreground">{p.dosage} · {p.frequency}</span></div>
                     ))}</div></CardContent></Card>
                 )}
               </div>
