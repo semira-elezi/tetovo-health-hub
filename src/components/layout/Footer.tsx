@@ -54,18 +54,11 @@ export default function Footer() {
           <div>
             <h4 className="mb-4 text-sm font-semibold">{t("footer.policies")}</h4>
             <div className="flex flex-col gap-2.5">
-              <Link to="/public-info" className="text-sm text-background/60 hover:text-background transition-colors">
-                {t("footer.patientRights")}
-              </Link>
-              <a href="http://alodoktore.mk/" target="_blank" rel="noopener noreferrer" className="text-sm text-background/60 hover:text-background transition-colors">
-                Alo Doktore
-              </a>
-              <a href="https://msc.gov.mk/" target="_blank" rel="noopener noreferrer" className="text-sm text-background/60 hover:text-background transition-colors">
-                {language === "mk" ? "Центар за медицинска симулација" : language === "sq" ? "Qendra e Simulimit Mjekësor" : "Medical Simulation Centre"}
-              </a>
-              <a href="https://vlada.mk/" target="_blank" rel="noopener noreferrer" className="text-sm text-background/60 hover:text-background transition-colors">
-                {language === "mk" ? "Влада на Северна Македонија" : language === "sq" ? "Qeveria e Maqedonisë së Veriut" : "Government of North Macedonia"}
-              </a>
+              <Link to="/public-info" className="text-sm text-background/60 hover:text-background transition-colors">{t("footer.patientRights")}</Link>
+              <Link to="/faq" className="text-sm text-background/60 hover:text-background transition-colors">{language === "mk" ? "ЧПП" : language === "sq" ? "Pyetjet" : "FAQ"}</Link>
+              <Link to="/working-hours" className="text-sm text-background/60 hover:text-background transition-colors">{language === "mk" ? "Работно време" : language === "sq" ? "Orari" : "Working Hours"}</Link>
+              <Link to="/terms" className="text-sm text-background/60 hover:text-background transition-colors">{language === "mk" ? "Услови" : language === "sq" ? "Termat" : "Terms"}</Link>
+              <a href="http://alodoktore.mk/" target="_blank" rel="noopener noreferrer" className="text-sm text-background/60 hover:text-background transition-colors">Alo Doktore</a>
             </div>
           </div>
 

@@ -1,8 +1,11 @@
 import { useParams, Link } from "react-router-dom";
+import { useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import ShareButtons from "@/components/ShareButtons";
 import { useTranslation } from "@/lib/i18n";
 import { useNewsArticle, useNews } from "@/hooks/useNews";
 import { format } from "date-fns";
@@ -43,11 +46,24 @@ export default function NewsDetail() {
     );
   }
 
+  // Track recently viewed
+  useEffect(() => {
+    if (!article) return;
+    try {
+      const key = "recently_viewed_news";
+      const prev = JSON.parse(localStorage.getItem(key) || "[]");
+      const next = [{ slug: article.slug, title: article.title, image_url: article.image_url, at: Date.now() }, ...prev.filter((p: any) => p.slug !== article.slug)].slice(0, 5);
+      localStorage.setItem(key, JSON.stringify(next));
+    } catch {}
+  }, [article]);
+
+  const recentlyViewed = (() => { try { return JSON.parse(localStorage.getItem("recently_viewed_news") || "[]").filter((r: any) => r.slug !== slug).slice(0, 3); } catch { return []; } })();
   const related = (allNews || []).filter((n) => n.slug !== slug).slice(0, 2);
 
   return (
     <Layout>
-      <div className="container py-16">
+      <Breadcrumbs />
+      <div className="container py-10">
         <Link to="/news" className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline mb-6">
           <ArrowLeft className="h-4 w-4" /> {backLabel}
         </Link>
@@ -71,28 +87,42 @@ export default function NewsDetail() {
                 <p key={i} className="text-base leading-[1.7] text-muted-foreground">{para}</p>
               ))}
             </div>
+
+            <div className="mt-8 pt-6 border-t">
+              <ShareButtons title={article.title} />
+            </div>
           </article>
 
-          <aside>
-            <h3 className="text-lg font-semibold mb-4">{relatedLabel}</h3>
-            <div className="space-y-4">
-              {related.map((item) => (
-                <Card key={item.id} className="card-hover rounded-2xl border shadow-card overflow-hidden">
-                  {item.image_url && (
-                    <img src={item.image_url} alt={item.title} className="h-32 w-full object-cover" loading="lazy" />
-                  )}
-                  <CardContent className="p-4">
-                    <p className="text-xs text-muted-foreground">
-                      {item.published_at ? format(new Date(item.published_at), "MMMM d, yyyy") : "Draft"}
-                    </p>
-                    <h4 className="mt-1 text-sm font-semibold leading-snug">{item.title}</h4>
-                    <Link to={`/news/${item.slug}`} className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
-                      {t("news.readMore")} <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </CardContent>
-                </Card>
-              ))}
+          <aside className="space-y-8">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">{relatedLabel}</h3>
+              <div className="space-y-4">
+                {related.map((item) => (
+                  <Card key={item.id} className="card-hover rounded-2xl border shadow-card overflow-hidden">
+                    {item.image_url && (<img src={item.image_url} alt={item.title} className="h-32 w-full object-cover" loading="lazy" />)}
+                    <CardContent className="p-4">
+                      <p className="text-xs text-muted-foreground">{item.published_at ? format(new Date(item.published_at), "MMMM d, yyyy") : "Draft"}</p>
+                      <h4 className="mt-1 text-sm font-semibold leading-snug">{item.title}</h4>
+                      <Link to={`/news/${item.slug}`} className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">{t("news.readMore")} <ArrowRight className="h-3 w-3" /></Link>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
+
+            {recentlyViewed.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-4">{language === "mk" ? "Неодамна прегледано" : language === "sq" ? "Të parët kohët e fundit" : "Recently Viewed"}</h3>
+                <div className="space-y-3">
+                  {recentlyViewed.map((r: any) => (
+                    <Link key={r.slug} to={`/news/${r.slug}`} className="flex gap-3 items-center rounded-xl border p-2 hover:bg-muted transition-colors">
+                      {r.image_url && <img src={r.image_url} alt="" className="h-12 w-12 rounded-lg object-cover shrink-0" />}
+                      <p className="text-sm font-medium line-clamp-2">{r.title}</p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </aside>
         </div>
       </div>
