@@ -1,7 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createSupabaseMock, createQueryBuilder } from "./mocks/supabase";
 
-const supabaseMock = createSupabaseMock();
+const { supabaseMock, createQueryBuilder } = vi.hoisted(() => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const m = require("./mocks/supabase");
+  return { supabaseMock: m.createSupabaseMock(), createQueryBuilder: m.createQueryBuilder };
+});
+
 vi.mock("@/integrations/supabase/client", () => ({ supabase: supabaseMock }));
 
 import {
