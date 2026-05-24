@@ -1,9 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createSupabaseMock } from "./mocks/supabase";
 
-const supabaseMock = createSupabaseMock({
-  storagePublicUrl: "https://cdn.example/labs/test.pdf",
-  functionsResult: { data: { summary: "Patient values within normal range." }, error: null },
+const { supabaseMock } = vi.hoisted(() => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { createSupabaseMock } = require("./mocks/supabase");
+  return {
+    supabaseMock: createSupabaseMock({
+      storagePublicUrl: "https://cdn.example/labs/test.pdf",
+      functionsResult: { data: { summary: "Patient values within normal range." }, error: null },
+    }),
+  };
 });
 
 vi.mock("@/integrations/supabase/client", () => ({ supabase: supabaseMock }));
