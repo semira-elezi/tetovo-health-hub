@@ -146,7 +146,7 @@ export default function HomePage() {
             </p>
             <div className="animate-hero-delay-3 mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="rounded-full px-8 py-3 btn-press">
-                <Link to="/contact">{t("hero.cta.appointment")}</Link>
+                <Link to="/appointments">{t("hero.cta.appointment")}</Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full px-8 py-3 btn-press">
                 <Link to="/departments">{t("hero.cta.departments")}</Link>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,8 +22,22 @@ const timeSlots = ["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00"
 
 export default function AppointmentsPage() {
   const { t, language } = useTranslation();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      toast.info(
+        language === "mk"
+          ? "Најавете се за да закажете термин"
+          : language === "sq"
+          ? "Kyçuni për të rezervuar termin"
+          : "Please log in to book an appointment"
+      );
+      navigate("/auth/login?redirect=/appointments", { replace: true });
+    }
+  }, [authLoading, user, navigate, language]);
+
   const [step, setStep] = useState(1);
   const [departmentSlug, setDepartmentSlug] = useState("");
   const [doctorId, setDoctorId] = useState("");
