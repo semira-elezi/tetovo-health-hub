@@ -17,7 +17,7 @@ import PatientHealthProfile from "@/components/features/patient/PatientHealthPro
 import PatientHealthMetrics from "@/components/features/patient/PatientHealthMetrics";
 import PatientMedicationReminders from "@/components/features/patient/PatientMedicationReminders";
 import PatientDocumentUpload from "@/components/features/patient/PatientDocumentUpload";
-import MessagesPanel from "@/components/features/messaging/MessagesPanel";
+
 import { exportAppointmentsPDF } from "@/lib/pdfExport";
 
 export default function PatientPortal() {
