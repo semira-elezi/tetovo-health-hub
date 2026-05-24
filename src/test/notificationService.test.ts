@@ -1,9 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const { supabaseMock, createQueryBuilder } = vi.hoisted(() => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const m = require("./mocks/supabase");
-  return { supabaseMock: m.createSupabaseMock(), createQueryBuilder: m.createQueryBuilder };
+const { supabaseMock, makeChain } = vi.hoisted(() => {
+  const makeChain = (result: any = { data: [], error: null }): any => {
+    const chain: any = {
+      select: vi.fn(() => chain),
+      insert: vi.fn(() => chain),
+      update: vi.fn(() => chain),
+      eq: vi.fn(() => chain),
+      order: vi.fn(() => chain),
+      limit: vi.fn(() => chain),
+      single: vi.fn(() => Promise.resolve(result)),
+      then: (cb: any) => Promise.resolve(result).then(cb),
+    };
+    return chain;
+  };
+  return {
+    makeChain,
+    supabaseMock: { from: vi.fn(() => makeChain()) },
+  };
 });
 
 vi.mock("@/integrations/supabase/client", () => ({ supabase: supabaseMock }));
@@ -16,11 +30,14 @@ import {
 } from "@/services/notificationService";
 
 describe("notificationService", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    supabaseMock.from.mockClear();
+    supabaseMock.from.mockImplementation(() => makeChain());
+  });
 
   it("fetches notifications for a user", async () => {
     const sample = [{ id: "n1", title: "Hi" }];
-    supabaseMock.from.mockReturnValueOnce(createQueryBuilder({ data: sample, error: null }));
+    supabaseMock.from.mockReturnValueOnce(makeChain({ data: sample, error: null }));
     const out = await fetchNotifications("user-1");
     expect(out).toEqual(sample);
     expect(supabaseMock.from).toHaveBeenCalledWith("notifications");
@@ -47,11 +64,7 @@ describe("notificationService", () => {
   });
 
   it("throws when insert errors", async () => {
-    supabaseMock.from.mockReturnValueOnce(
-      createQueryBuilder({ data: null, error: new Error("denied") })
-    );
-    await expect(
-      createNotification({ user_id: "u", title: "t" })
-    ).rejects.toThrow("denied");
+    supabaseMock.from.mockReturnValueOnce(makeChain({ data: null, error: new Error("denied") }));
+    await expect(createNotification({ user_id: "u", title: "t" })).rejects.toThrow("denied");
   });
 });

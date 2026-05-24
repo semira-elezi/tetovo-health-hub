@@ -1,13 +1,33 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const { supabaseMock } = vi.hoisted(() => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { createSupabaseMock } = require("./mocks/supabase");
+  const makeChain = (result: any = { data: [], error: null }): any => {
+    const chain: any = {
+      select: vi.fn(() => chain),
+      insert: vi.fn(() => chain),
+      update: vi.fn(() => chain),
+      eq: vi.fn(() => chain),
+      order: vi.fn(() => chain),
+      limit: vi.fn(() => chain),
+      single: vi.fn(() => Promise.resolve(result)),
+      then: (cb: any) => Promise.resolve(result).then(cb),
+    };
+    return chain;
+  };
+  const storageBucket = {
+    upload: vi.fn(() => Promise.resolve({ data: { path: "x" }, error: null })),
+    getPublicUrl: vi.fn(() => ({ data: { publicUrl: "https://cdn.example/labs/test.pdf" } })),
+  };
   return {
-    supabaseMock: createSupabaseMock({
-      storagePublicUrl: "https://cdn.example/labs/test.pdf",
-      functionsResult: { data: { summary: "Patient values within normal range." }, error: null },
-    }),
+    supabaseMock: {
+      from: vi.fn(() => makeChain()),
+      storage: { from: vi.fn(() => storageBucket) },
+      functions: {
+        invoke: vi.fn(() =>
+          Promise.resolve({ data: { summary: "Patient values within normal range." }, error: null })
+        ),
+      },
+    },
   };
 });
 
@@ -17,7 +37,8 @@ import { uploadLabFile, generateLabSummary } from "@/services/labService";
 
 describe("labService", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    supabaseMock.storage.from.mockClear();
+    supabaseMock.functions.invoke.mockClear();
   });
 
   it("uploads a PDF and returns public URL with pdf type", async () => {
