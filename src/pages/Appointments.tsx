@@ -17,6 +17,8 @@ import { createNotification } from "@/services/notificationService";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const timeSlots = ["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
 
@@ -60,6 +62,22 @@ export default function AppointmentsPage() {
   };
 
   const selectedDoctor = doctors?.find((d) => d.id === doctorId);
+
+  const dateKey = date ? date.toISOString().split("T")[0] : "";
+  const { data: takenSlots = [] } = useQuery({
+    queryKey: ["taken-slots", doctorId, dateKey],
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as any)("get_taken_slots", {
+        _doctor_id: doctorId,
+        _date: dateKey,
+      });
+      if (error) throw error;
+      return (data || []).map((r: any) => (r.start_time as string).slice(0, 5));
+    },
+    enabled: !!doctorId && !!dateKey,
+  });
+
+  const availableSlots = timeSlots.filter((s) => !takenSlots.includes(s));
 
   const handleConfirm = async () => {
     if (!user) {
@@ -189,7 +207,12 @@ export default function AppointmentsPage() {
                 <Calendar mode="single" selected={date} onSelect={setDate} disabled={(d) => d < new Date() || d.getDay() === 0} className="mx-auto pointer-events-auto" />
                 {date && (
                   <div className="flex flex-wrap gap-2">
-                    {timeSlots.map((slot) => (
+                    {availableSlots.length === 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        {language === "mk" ? "Нема слободни термини за овој ден" : language === "sq" ? "Nuk ka terma të lirë për këtë ditë" : "No available slots for this day"}
+                      </p>
+                    )}
+                    {availableSlots.map((slot) => (
                       <Badge key={slot} variant={time === slot ? "default" : "outline"} className="cursor-pointer rounded-full" onClick={() => setTime(slot)}>{slot}</Badge>
                     ))}
                   </div>
