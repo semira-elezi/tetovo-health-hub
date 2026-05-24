@@ -176,7 +176,7 @@ export default function PatientPortal() {
             {tab === "meds" && <PatientMedicationReminders />}
             {tab === "health-profile" && <PatientHealthProfile />}
             {tab === "uploads" && <PatientDocumentUpload />}
-            {tab === "messages" && <MessagesPanel />}
+            
 
             {tab === "profile" && profileForm && (
               <Card><CardHeader><CardTitle>{t("portal.profile")}</CardTitle></CardHeader>
