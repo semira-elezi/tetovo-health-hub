@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, FileText, Download, User, Activity, Clock, FlaskConical, HeartPulse, Bell, MessageSquare, Upload, ShieldCheck } from "lucide-react";
+import { Calendar, FileText, Download, User, Activity, Clock, FlaskConical, HeartPulse, Bell, Upload, ShieldCheck } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
