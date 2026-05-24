@@ -63,6 +63,22 @@ export default function AppointmentsPage() {
 
   const selectedDoctor = doctors?.find((d) => d.id === doctorId);
 
+  const dateKey = date ? date.toISOString().split("T")[0] : "";
+  const { data: takenSlots = [] } = useQuery({
+    queryKey: ["taken-slots", doctorId, dateKey],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_taken_slots", {
+        _doctor_id: doctorId,
+        _date: dateKey,
+      });
+      if (error) throw error;
+      return (data || []).map((r: any) => (r.start_time as string).slice(0, 5));
+    },
+    enabled: !!doctorId && !!dateKey,
+  });
+
+  const availableSlots = timeSlots.filter((s) => !takenSlots.includes(s));
+
   const handleConfirm = async () => {
     if (!user) {
       toast.error(language === "mk" ? "Најавете се прво" : language === "sq" ? "Kyçuni fillimisht" : "Please log in first");
