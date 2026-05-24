@@ -107,14 +107,9 @@ export default function Navbar() {
       >
         <div className="container flex h-14 items-center justify-between gap-3">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M7 3h2v10H7V3z" fill="currentColor" />
-                <path d="M3 7h10v2H3V7z" fill="currentColor" />
-              </svg>
-            </div>
-            <span className="hidden text-sm font-bold tracking-tight text-foreground lg:inline-block">
+          <Link to="/" className="flex items-center gap-2.5 shrink-0">
+            <img src="/logo.svg" alt="Clinical Hospital Tetovo" className="h-9 w-9" width={36} height={36} />
+            <span className="hidden text-sm font-bold tracking-tight text-foreground lg:inline-block leading-tight">
               {t("footer.hospitalName")}
             </span>
           </Link>
