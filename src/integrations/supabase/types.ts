@@ -870,6 +870,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_taken_slots: {
+        Args: { _date: string; _doctor_id: string }
+        Returns: {
+          start_time: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
