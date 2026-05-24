@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      allergies: {
+        Row: {
+          allergen: string
+          created_at: string
+          id: string
+          patient_id: string
+          reaction: string | null
+          severity: string | null
+        }
+        Insert: {
+          allergen: string
+          created_at?: string
+          id?: string
+          patient_id: string
+          reaction?: string | null
+          severity?: string | null
+        }
+        Update: {
+          allergen?: string
+          created_at?: string
+          id?: string
+          patient_id?: string
+          reaction?: string | null
+          severity?: string | null
+        }
+        Relationships: []
+      }
       announcements: {
         Row: {
           content: string | null
@@ -147,6 +174,36 @@ export type Database = {
           record_id?: string | null
           table_name?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      chronic_conditions: {
+        Row: {
+          condition: string
+          created_at: string
+          diagnosed_date: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          patient_id: string
+        }
+        Insert: {
+          condition: string
+          created_at?: string
+          diagnosed_date?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          patient_id: string
+        }
+        Update: {
+          condition?: string
+          created_at?: string
+          diagnosed_date?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          patient_id?: string
         }
         Relationships: []
       }
@@ -344,6 +401,36 @@ export type Database = {
           },
         ]
       }
+      emergency_contacts: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          patient_id: string
+          phone: string
+          relationship: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id?: string
+          patient_id: string
+          phone: string
+          relationship?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          patient_id?: string
+          phone?: string
+          relationship?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       er_wait_times: {
         Row: {
           current_wait_minutes: number
@@ -368,6 +455,48 @@ export type Database = {
           patient_count?: number
           severity_level?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      faqs: {
+        Row: {
+          answer_en: string
+          answer_mk: string | null
+          answer_sq: string | null
+          category: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          question_en: string
+          question_mk: string | null
+          question_sq: string | null
+          sort_order: number
+        }
+        Insert: {
+          answer_en: string
+          answer_mk?: string | null
+          answer_sq?: string | null
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          question_en: string
+          question_mk?: string | null
+          question_sq?: string | null
+          sort_order?: number
+        }
+        Update: {
+          answer_en?: string
+          answer_mk?: string | null
+          answer_sq?: string | null
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          question_en?: string
+          question_mk?: string | null
+          question_sq?: string | null
+          sort_order?: number
         }
         Relationships: []
       }
@@ -417,6 +546,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      health_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          metric_type: string
+          notes: string | null
+          patient_id: string
+          recorded_at: string
+          unit: string | null
+          value_numeric: number | null
+          value_text: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metric_type: string
+          notes?: string | null
+          patient_id: string
+          recorded_at?: string
+          unit?: string | null
+          value_numeric?: number | null
+          value_text?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metric_type?: string
+          notes?: string | null
+          patient_id?: string
+          recorded_at?: string
+          unit?: string | null
+          value_numeric?: number | null
+          value_text?: string | null
+        }
+        Relationships: []
+      }
+      insurance_info: {
+        Row: {
+          created_at: string
+          expiry_date: string | null
+          group_number: string | null
+          id: string
+          notes: string | null
+          patient_id: string
+          policy_number: string | null
+          provider: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expiry_date?: string | null
+          group_number?: string | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          policy_number?: string | null
+          provider: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expiry_date?: string | null
+          group_number?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          policy_number?: string | null
+          provider?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       lab_results: {
         Row: {
@@ -533,6 +734,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      medication_reminders: {
+        Row: {
+          created_at: string
+          days_of_week: number[] | null
+          dosage: string | null
+          id: string
+          is_active: boolean
+          medication_name: string
+          patient_id: string
+          prescription_id: string | null
+          time_of_day: string
+        }
+        Insert: {
+          created_at?: string
+          days_of_week?: number[] | null
+          dosage?: string | null
+          id?: string
+          is_active?: boolean
+          medication_name: string
+          patient_id: string
+          prescription_id?: string | null
+          time_of_day: string
+        }
+        Update: {
+          created_at?: string
+          days_of_week?: number[] | null
+          dosage?: string | null
+          id?: string
+          is_active?: boolean
+          medication_name?: string
+          patient_id?: string
+          prescription_id?: string | null
+          time_of_day?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_read: boolean
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: []
       }
       news: {
         Row: {
@@ -862,6 +1126,72 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vaccinations: {
+        Row: {
+          administered_date: string
+          created_at: string
+          id: string
+          lot_number: string | null
+          next_dose_date: string | null
+          notes: string | null
+          patient_id: string
+          vaccine_name: string
+        }
+        Insert: {
+          administered_date: string
+          created_at?: string
+          id?: string
+          lot_number?: string | null
+          next_dose_date?: string | null
+          notes?: string | null
+          patient_id: string
+          vaccine_name: string
+        }
+        Update: {
+          administered_date?: string
+          created_at?: string
+          id?: string
+          lot_number?: string | null
+          next_dose_date?: string | null
+          notes?: string | null
+          patient_id?: string
+          vaccine_name?: string
+        }
+        Relationships: []
+      }
+      working_hours: {
+        Row: {
+          close_time: string | null
+          created_at: string
+          day_of_week: number
+          department_id: string | null
+          id: string
+          is_closed: boolean
+          notes: string | null
+          open_time: string | null
+        }
+        Insert: {
+          close_time?: string | null
+          created_at?: string
+          day_of_week: number
+          department_id?: string | null
+          id?: string
+          is_closed?: boolean
+          notes?: string | null
+          open_time?: string | null
+        }
+        Update: {
+          close_time?: string | null
+          created_at?: string
+          day_of_week?: number
+          department_id?: string | null
+          id?: string
+          is_closed?: boolean
+          notes?: string | null
+          open_time?: string | null
         }
         Relationships: []
       }
