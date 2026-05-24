@@ -207,7 +207,12 @@ export default function AppointmentsPage() {
                 <Calendar mode="single" selected={date} onSelect={setDate} disabled={(d) => d < new Date() || d.getDay() === 0} className="mx-auto pointer-events-auto" />
                 {date && (
                   <div className="flex flex-wrap gap-2">
-                    {timeSlots.map((slot) => (
+                    {availableSlots.length === 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        {language === "mk" ? "Нема слободни термини за овој ден" : language === "sq" ? "Nuk ka terma të lirë për këtë ditë" : "No available slots for this day"}
+                      </p>
+                    )}
+                    {availableSlots.map((slot) => (
                       <Badge key={slot} variant={time === slot ? "default" : "outline"} className="cursor-pointer rounded-full" onClick={() => setTime(slot)}>{slot}</Badge>
                     ))}
                   </div>
