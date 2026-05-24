@@ -9,6 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/layout/Layout";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/lib/i18n";
+import { useNews } from "@/hooks/useNews";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 /* ─── Counter animation hook ─── */
 function useCountUp(target: number, duration = 1500) {
@@ -124,9 +128,25 @@ export default function HomePage() {
     return obj[language] || obj.en;
   };
 
+  const { data: latestNews } = useNews();
+  const { data: procurementDocs } = useQuery({
+    queryKey: ["procurement-documents-counts"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("procurement_documents").select("category");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const publicInfoItems = [
-    t("publicInfo.documents"), t("publicInfo.budget"), t("publicInfo.quarterlyReports"), t("publicInfo.annualReports"),
-    t("publicInfo.jobListings"), t("publicInfo.procurementPlan"), t("publicInfo.procurementAnnouncements"), t("publicInfo.patientRights"),
+    { key: "documents", label: t("publicInfo.documents") },
+    { key: "budget", label: t("publicInfo.budget") },
+    { key: "quarterly_reports", label: t("publicInfo.quarterlyReports") },
+    { key: "annual_financial_reports", label: t("publicInfo.annualReports") },
+    { key: "internal_job_listings", label: t("publicInfo.jobListings") },
+    { key: "annual_procurement_plan", label: t("publicInfo.procurementPlan") },
+    { key: "procurement_announcements", label: t("publicInfo.procurementAnnouncements") },
+    { key: "patient_rights", label: t("publicInfo.patientRights") },
   ];
 
   return (
