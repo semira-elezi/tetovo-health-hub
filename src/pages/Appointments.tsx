@@ -67,7 +67,7 @@ export default function AppointmentsPage() {
   const { data: takenSlots = [] } = useQuery({
     queryKey: ["taken-slots", doctorId, dateKey],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_taken_slots", {
+      const { data, error } = await (supabase.rpc as any)("get_taken_slots", {
         _doctor_id: doctorId,
         _date: dateKey,
       });
