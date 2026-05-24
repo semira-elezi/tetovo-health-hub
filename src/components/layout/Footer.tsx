@@ -12,7 +12,7 @@ export default function Footer() {
           {/* Column 1 — Brand */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <img src="/logo.svg" alt="Clinical Hospital Tetovo" className="h-10 w-10 bg-background/10 rounded-md p-0.5" width={40} height={40} />
+              <img src="/logo.png" alt="Clinical Hospital Tetovo" className="h-10 w-10 bg-white rounded-full p-0.5" width={40} height={40} />
               <span className="text-sm font-bold leading-tight">{t("footer.hospitalName")}</span>
             </div>
             <p className="text-sm text-background/60 leading-relaxed">
