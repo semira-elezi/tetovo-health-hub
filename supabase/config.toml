@@ -1,1 +1,10 @@
 project_id = "dvqoinfleibnvunnxegs"
+
+[functions.symptom-triage]
+verify_jwt = false
+
+[functions.lab-summary]
+verify_jwt = false
+
+[functions.register-doctor]
+verify_jwt = true
