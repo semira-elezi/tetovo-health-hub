@@ -248,14 +248,22 @@ export default function HomePage() {
             <p className="mt-3 max-w-2xl mx-auto text-muted-foreground">{t("publicInfo.description")}</p>
           </div>
           <div className="mt-12 grid gap-4 grid-cols-2 md:grid-cols-4">
-            {publicInfoItems.map((item) => (
-              <Card key={item} className="card-hover rounded-2xl border shadow-card cursor-pointer">
-                <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
-                  <FileText className="h-8 w-8 text-primary" />
-                  <p className="text-sm font-semibold">{item}</p>
-                </CardContent>
-              </Card>
-            ))}
+            {publicInfoItems.map((item) => {
+              const count = (procurementDocs || []).filter((d: any) => d.category === item.key).length;
+              return (
+                <Link key={item.key} to="/public-info">
+                  <Card className="card-hover rounded-2xl border shadow-card cursor-pointer h-full">
+                    <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
+                      <FileText className="h-8 w-8 text-primary" />
+                      <p className="text-sm font-semibold">{item.label}</p>
+                      <Badge variant="outline" className="rounded-full text-xs">
+                        {count} {language === "mk" ? "документи" : language === "sq" ? "dokumente" : "documents"}
+                      </Badge>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -267,27 +275,32 @@ export default function HomePage() {
             <h2 className="text-3xl font-bold md:text-4xl">{t("news.title")}</h2>
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {/* These are still static news items — they'll be dynamic once wired to DB */}
-            {[
-              { slug: "new-medical-equipment", title: language === "mk" ? "Нова медицинска опрема за Онкологија" : language === "sq" ? "Pajisje të reja mjekësore për Onkologjinë" : "New Medical Equipment for the Oncology Department", date: "March 10, 2025", category: t("news.hospital"), excerpt: language === "mk" ? "Болницата доби нова современа опрема за цитостатска терапија." : language === "sq" ? "Spitali ka marrë pajisje të reja për terapinë citostatike." : "The hospital has received new state-of-the-art equipment for cytostatic therapy.", image: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?w=600&q=80" },
-              { slug: "health-screening-campaign", title: language === "mk" ? "Годишна кампања за здравствен скрининг" : language === "sq" ? "Fushata vjetore e ekzaminimeve shëndetësore" : "Annual Health Screening Campaign", date: "February 22, 2025", category: t("news.healthTips"), excerpt: language === "mk" ? "Бесплатни превентивни прегледи за граѓаните на Тетовскиот регион." : language === "sq" ? "Ekzaminime falas parandaluese për qytetarët e rajonit të Tetovës." : "Free preventive examinations for citizens of the Tetovo region.", image: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&q=80" },
-              { slug: "50-years", title: language === "mk" ? "Клиничка Болница Тетово слави 50 години" : language === "sq" ? "Spitali Klinik Tetovë feston 50 vjet" : "Clinical Hospital Tetovo Celebrates 50 Years", date: "January 15, 2025", category: t("news.events"), excerpt: language === "mk" ? "Оваа година бележиме пет децении посветена медицинска служба." : language === "sq" ? "Këtë vit shënojmë pesë dekada shërbim mjekësor të përkushtuar." : "This year marks five decades of dedicated medical service.", image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80" },
-            ].map((item) => (
-              <Card key={item.slug} className="card-hover rounded-2xl border shadow-card overflow-hidden">
-                <img src={item.image} alt={item.title} className="h-48 w-full object-cover" loading="lazy" />
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">{item.date}</span>
-                    <Badge className="rounded-full bg-accent text-accent-foreground text-xs px-2.5 py-0.5">{item.category}</Badge>
-                  </div>
-                  <h3 className="mt-3 text-base font-semibold leading-snug">{item.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed line-clamp-2">{item.excerpt}</p>
-                  <Link to={`/news/${item.slug}`} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-                    {t("news.readMore")} <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
+            {(latestNews || []).slice(0, 3).map((item: any) => {
+              const catKey = item.category === "hospital_news" ? "news.hospital" : item.category === "health_tips" ? "news.healthTips" : item.category === "events" ? "news.events" : "news.announcements";
+              return (
+                <Card key={item.id} className="card-hover rounded-2xl border shadow-card overflow-hidden">
+                  {item.image_url && (
+                    <img src={item.image_url} alt={item.title} className="h-48 w-full object-cover" loading="lazy" />
+                  )}
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {item.published_at ? format(new Date(item.published_at), "MMMM d, yyyy") : ""}
+                      </span>
+                      <Badge className="rounded-full bg-accent text-accent-foreground text-xs px-2.5 py-0.5">{t(catKey as any)}</Badge>
+                    </div>
+                    <h3 className="mt-3 text-base font-semibold leading-snug">{item.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed line-clamp-2">{item.excerpt}</p>
+                    <Link to={`/news/${item.slug}`} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+                      {t("news.readMore")} <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </CardContent>
+                </Card>
+              );
+            })}
+            {latestNews && latestNews.length === 0 && (
+              <p className="col-span-full text-center text-muted-foreground">{language === "mk" ? "Нема вести" : language === "sq" ? "Nuk ka lajme" : "No news yet"}</p>
+            )}
           </div>
         </div>
       </section>
