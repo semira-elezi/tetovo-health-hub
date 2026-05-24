@@ -7,6 +7,7 @@ import { useTranslation, Language } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import GlobalSearch from "@/components/GlobalSearch";
 import NotificationBell from "@/components/features/notifications/NotificationBell";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const languages: { code: Language; label: string }[] = [
   { code: "mk", label: "MK" },
@@ -162,6 +163,9 @@ export default function Navbar() {
             <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="hidden sm:flex">
               <Search className="h-4 w-4" />
             </Button>
+
+            {/* Theme toggle */}
+            <ThemeToggle />
 
             {/* Notifications */}
             {user && <NotificationBell />}

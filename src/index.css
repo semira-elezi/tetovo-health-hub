@@ -140,3 +140,10 @@
     transform: scale(0.97);
   }
 }
+
+@media print {
+  nav, header, footer, .print\:hidden { display: none !important; }
+  main { padding: 0 !important; }
+  body { background: white !important; color: black !important; }
+  .card-hover, .shadow-card { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
+}
