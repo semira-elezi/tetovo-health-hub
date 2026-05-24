@@ -92,7 +92,7 @@ export default function PatientPortal() {
     { key: "meds", icon: Bell, label: language === "sq" ? "Kujtues" : language === "mk" ? "Потсетници" : "Reminders" },
     { key: "health-profile", icon: ShieldCheck, label: language === "sq" ? "Profili" : language === "mk" ? "Профил" : "Health Profile" },
     { key: "uploads", icon: Upload, label: language === "sq" ? "Dokumentet e mia" : language === "mk" ? "Документи" : "My Documents" },
-    { key: "messages", icon: MessageSquare, label: language === "sq" ? "Mesazhet" : language === "mk" ? "Пораки" : "Messages" },
+    
     { key: "profile", icon: User, label: t("portal.profile") },
   ];
 
