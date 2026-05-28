@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex-1 pb-20 md:pb-0">{children}</main>
+      <main className="flex-1 pb-20 md:pb-0 min-h-[calc(100vh-3.5rem)]">{children}</main>
       <Footer />
       <BackToTop />
       <SymptomCheckerFAB />
