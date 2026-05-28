@@ -12,6 +12,9 @@ verify_jwt = false
 [functions.doctor-daily-digest]
 verify_jwt = false
 
+[functions.list-admin-emails]
+verify_jwt = false
+
 [functions.lab-summary]
 verify_jwt = false
 
