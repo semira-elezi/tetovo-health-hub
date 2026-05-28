@@ -18,6 +18,7 @@ import { Navigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { toast } from "sonner";
 import { addDays, isAfter, parseISO } from "date-fns";
+import { sendEmail } from "@/services/emailService";
 
 const STATUS_BADGE: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   pending: "outline", confirmed: "default", in_progress: "secondary", completed: "default", cancelled: "destructive", no_show: "destructive",
@@ -49,6 +50,21 @@ export default function PatientAppointments() {
     mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
       const { error } = await supabase.from("appointments").update({ status: "cancelled" as any, notes: reason }).eq("id", id);
       if (error) throw error;
+      const appt = appointments?.find((a: any) => a.id === id);
+      if (appt && user?.email) {
+        sendEmail({
+          type: "appointment_cancelled",
+          to: user.email,
+          data: {
+            patientName: user.email,
+            doctorName: (appt as any).doctors?.full_name || "",
+            department: (appt as any).departments?.name_en || "",
+            date: appt.appointment_date,
+            time: String(appt.start_time).slice(0, 5),
+            reason,
+          },
+        });
+      }
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["patient-appointments"] }); toast.success("Appointment cancelled"); },
     onError: () => toast.error("Failed to cancel"),
@@ -180,7 +196,26 @@ function FeedbackModal({ appointment, onClose }: { appointment: any; onClose: ()
     });
     setLoading(false);
     if (error) toast.error("Failed to submit feedback");
-    else { toast.success("Thank you! Your feedback will appear after review."); onClose(); }
+    else {
+      toast.success("Thank you! Your feedback will appear after review.");
+      // Notify admins
+      try {
+        const { data: admins } = await supabase.functions.invoke("list-admin-emails");
+        const emails = (admins as any)?.emails || [];
+        emails.forEach((e: string) =>
+          sendEmail({
+            type: "admin_new_feedback",
+            to: e,
+            data: {
+              rating,
+              comment,
+              department: (appointment as any)?.departments?.name_en || "",
+            },
+          }),
+        );
+      } catch (_) { /* non-blocking */ }
+      onClose();
+    }
   };
 
   return (
