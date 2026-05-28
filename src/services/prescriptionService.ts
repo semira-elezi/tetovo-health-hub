@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { sendEmail } from "./emailService";
 
 export interface PrescriptionInput {
   patient_id: string;
@@ -38,6 +39,14 @@ export async function createPrescription(input: PrescriptionInput) {
     .select()
     .single();
   if (error) throw error;
+
+  // Notify patient via email (fire-and-forget)
+  sendEmail({
+    type: "prescription_issued",
+    userId: input.patient_id,
+    data: { medication: input.medication_name },
+  });
+
   return data;
 }
 
