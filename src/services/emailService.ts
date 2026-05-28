@@ -17,7 +17,8 @@ export type EmailType =
 
 export interface SendEmailPayload {
   type: EmailType;
-  to: string;
+  to?: string;
+  userId?: string; // server resolves to auth email
   lang?: "sq" | "mk" | "en";
   data?: Record<string, any>;
 }

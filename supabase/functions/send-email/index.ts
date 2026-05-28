@@ -284,10 +284,23 @@ Deno.serve(async (req) => {
     if (!apiKey) throw new Error("RESEND_API_KEY not configured");
 
     const body = (await req.json()) as SendEmailRequest;
-    if (!body?.type || !body?.to) {
-      return new Response(JSON.stringify({ error: "type and to are required" }), {
+    if (!body?.type || (!body?.to && !body?.userId)) {
+      return new Response(JSON.stringify({ error: "type and (to or userId) are required" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Resolve email from userId if needed
+    let recipient = body.to;
+    if (!recipient && body.userId) {
+      const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+      const { data: u } = await sb.auth.admin.getUserById(body.userId);
+      recipient = u?.user?.email || undefined;
+      if (!recipient) {
+        return new Response(JSON.stringify({ error: "Could not resolve recipient email" }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     const lang = (body.lang || "sq") as Lang;
@@ -298,7 +311,7 @@ Deno.serve(async (req) => {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
         from: FROM,
-        to: [body.to],
+        to: [recipient],
         subject,
         html,
       }),
