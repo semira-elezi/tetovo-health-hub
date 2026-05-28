@@ -26,6 +26,17 @@ export default function NewsDetail() {
   const backLabel = language === "mk" ? "Назад кон Вести" : language === "sq" ? "Kthehu te Lajmet" : "Back to News";
   const relatedLabel = language === "mk" ? "Поврзани статии" : language === "sq" ? "Artikuj të ngjashëm" : "Related Articles";
 
+  // Track recently viewed (must run before any early return to keep hook order stable)
+  useEffect(() => {
+    if (!article) return;
+    try {
+      const key = "recently_viewed_news";
+      const prev = JSON.parse(localStorage.getItem(key) || "[]");
+      const next = [{ slug: article.slug, title: article.title, image_url: article.image_url, at: Date.now() }, ...prev.filter((p: any) => p.slug !== article.slug)].slice(0, 5);
+      localStorage.setItem(key, JSON.stringify(next));
+    } catch {}
+  }, [article]);
+
   if (isLoading) {
     return (
       <Layout>
@@ -46,16 +57,6 @@ export default function NewsDetail() {
     );
   }
 
-  // Track recently viewed
-  useEffect(() => {
-    if (!article) return;
-    try {
-      const key = "recently_viewed_news";
-      const prev = JSON.parse(localStorage.getItem(key) || "[]");
-      const next = [{ slug: article.slug, title: article.title, image_url: article.image_url, at: Date.now() }, ...prev.filter((p: any) => p.slug !== article.slug)].slice(0, 5);
-      localStorage.setItem(key, JSON.stringify(next));
-    } catch {}
-  }, [article]);
 
   const recentlyViewed = (() => { try { return JSON.parse(localStorage.getItem("recently_viewed_news") || "[]").filter((r: any) => r.slug !== slug).slice(0, 3); } catch { return []; } })();
   const related = (allNews || []).filter((n) => n.slug !== slug).slice(0, 2);
