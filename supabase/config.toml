@@ -1,10 +1,19 @@
-project_id = "dvqoinfleibnvunnxegs"
+project_id = "hjesubcysaxwpayuuqfi"
 
-[functions.symptom-triage]
+[functions.register-doctor]
+verify_jwt = true
+
+[functions.send-email]
+verify_jwt = false
+
+[functions.appointment-reminders]
+verify_jwt = false
+
+[functions.doctor-daily-digest]
 verify_jwt = false
 
 [functions.lab-summary]
 verify_jwt = false
 
-[functions.register-doctor]
-verify_jwt = true
+[functions.symptom-triage]
+verify_jwt = false
