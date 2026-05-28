@@ -76,7 +76,9 @@ export default function PatientAppointments() {
 
   const canCancel = (a: any) => {
     if (!["pending", "confirmed"].includes(a.status)) return false;
-    return isAfter(parseISO(a.appointment_date), addDays(new Date(), 1));
+    // Allow cancellation any time before the appointment date (inclusive of same-day).
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return !isAfter(today, parseISO(a.appointment_date));
   };
 
   return (

@@ -7,7 +7,9 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const FROM = "PHI Tetovo <onboarding@resend.dev>"; // change once a domain is verified in Resend
+// Override by setting EMAIL_FROM secret once a domain is verified in Resend
+// e.g. EMAIL_FROM="PHI Tetovo <no-reply@yourdomain.com>"
+const FROM = Deno.env.get("EMAIL_FROM") || "PHI Tetovo <onboarding@resend.dev>";
 const NAVY = "#1E3A8A";
 const SOFT = "#3B82F6";
 const BG = "#F5F7FA";
