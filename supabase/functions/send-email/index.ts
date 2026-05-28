@@ -16,7 +16,8 @@ type Lang = "sq" | "mk" | "en";
 
 interface SendEmailRequest {
   type: string;
-  to: string;
+  to?: string;
+  userId?: string; // resolved server-side to auth email
   lang?: Lang;
   data?: Record<string, any>;
 }
