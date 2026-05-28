@@ -15,6 +15,7 @@ import { Navigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { sendEmail } from "@/services/emailService";
 
 const STATUS_BADGE: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   pending: "outline", confirmed: "default", in_progress: "secondary", completed: "default", cancelled: "destructive", no_show: "destructive",
@@ -62,6 +63,21 @@ export default function AdminAppointments() {
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const { error } = await supabase.from("appointments").update({ status: status as any }).eq("id", id);
       if (error) throw error;
+      const appt = (appointments?.data || []).find((a: any) => a.id === id);
+      if (appt) {
+        sendEmail({
+          type: status === "cancelled" ? "appointment_cancelled" : "appointment_status",
+          userId: (appt as any).patient_id,
+          data: {
+            patientName: "",
+            doctorName: (appt as any).doctors?.full_name || "",
+            department: (appt as any).departments?.name_en || "",
+            date: (appt as any).appointment_date,
+            time: String((appt as any).start_time).slice(0, 5),
+            status,
+          },
+        });
+      }
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["admin-all-appointments"] }); toast.success("Status updated"); },
     onError: () => toast.error("Failed to update status"),
