@@ -14,6 +14,7 @@ import { useDoctors } from "@/hooks/useDoctors";
 import { useCreateAppointment } from "@/hooks/useAppointments";
 import { useAuth } from "@/hooks/useAuth";
 import { createNotification } from "@/services/notificationService";
+import { sendEmail } from "@/services/emailService";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -102,7 +103,7 @@ export default function AppointmentsPage() {
 
       setConfirmedId(result.id.slice(0, 8).toUpperCase());
 
-      // Notify the doctor
+      // Notify the doctor (in-app)
       if (selectedDoctor?.user_id) {
         await createNotification({
           user_id: selectedDoctor.user_id,
@@ -112,6 +113,39 @@ export default function AppointmentsPage() {
           link: "/doctor/dashboard",
         }).catch(() => {});
       }
+
+      // Email: patient confirmation + doctor alert (fire-and-forget)
+      const deptName = selectedDept ? getName(selectedDept) : "";
+      const dateStr = date.toISOString().split("T")[0];
+      if (user.email) {
+        sendEmail({
+          type: "appointment_confirm",
+          to: user.email,
+          lang: language as any,
+          data: {
+            patientName: name || user.email,
+            doctorName: selectedDoctor?.full_name || "",
+            department: deptName,
+            date: dateStr,
+            time,
+          },
+        });
+      }
+      if (selectedDoctor?.email) {
+        sendEmail({
+          type: "doctor_new_booking",
+          to: selectedDoctor.email,
+          lang: language as any,
+          data: {
+            doctorName: selectedDoctor.full_name,
+            patientName: name || user.email || "",
+            date: dateStr,
+            time,
+            reason: notes,
+          },
+        });
+      }
+
 
       setStep(5);
     } catch (err: any) {

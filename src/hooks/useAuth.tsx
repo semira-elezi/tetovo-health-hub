@@ -111,6 +111,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         })
         .eq("id", data.user.id);
     }
+    if (!error && data.user) {
+      // Welcome email (fire-and-forget)
+      supabase.functions.invoke("send-email", {
+        body: {
+          type: "welcome_patient",
+          to: email,
+          data: { patientName: meta?.fullName || email },
+        },
+      }).catch(() => {});
+    }
     return { error: error as Error | null };
   };
 

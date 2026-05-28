@@ -12,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { createNotification } from "@/services/notificationService";
 import { uploadLabFile, generateLabSummary } from "@/services/labService";
+import { sendEmail } from "@/services/emailService";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -81,6 +82,15 @@ export default function LabResultsPanel({ doctorId }: { doctorId: string }) {
             type: "lab_result",
             link: "/portal",
           }).catch(() => {});
+
+          sendEmail({
+            type: "lab_results",
+            userId: result.patient_id,
+            data: {
+              patientName: (result as any).profiles?.full_name || "",
+              testName: result.test_name,
+            },
+          });
 
           // Generate AI summary in background
           generateLabSummary(vars.id).then(() => {

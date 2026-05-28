@@ -114,6 +114,19 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Send welcome email to the new doctor (fire-and-forget)
+    try {
+      await adminClient.functions.invoke("send-email", {
+        body: {
+          type: "doctor_welcome",
+          to: email,
+          data: { doctorName: full_name, email },
+        },
+      });
+    } catch (e) {
+      console.warn("doctor welcome email failed", e);
+    }
+
     return new Response(JSON.stringify({ success: true, doctor }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
