@@ -177,6 +177,78 @@ export type Database = {
         }
         Relationships: []
       }
+      blood_donation_requests: {
+        Row: {
+          blood_type: Database["public"]["Enums"]["blood_type"]
+          city: string | null
+          consent_contact: boolean
+          created_at: string
+          date_of_birth: string | null
+          email: string | null
+          full_name: string
+          id: string
+          notes: string | null
+          phone: string
+          preferred_date: string | null
+          status: Database["public"]["Enums"]["donation_status"]
+          updated_at: string
+        }
+        Insert: {
+          blood_type?: Database["public"]["Enums"]["blood_type"]
+          city?: string | null
+          consent_contact?: boolean
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone: string
+          preferred_date?: string | null
+          status?: Database["public"]["Enums"]["donation_status"]
+          updated_at?: string
+        }
+        Update: {
+          blood_type?: Database["public"]["Enums"]["blood_type"]
+          city?: string | null
+          consent_contact?: boolean
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone?: string
+          preferred_date?: string | null
+          status?: Database["public"]["Enums"]["donation_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      blood_stock: {
+        Row: {
+          blood_type: Database["public"]["Enums"]["blood_type"]
+          id: string
+          level: string
+          units: number
+          updated_at: string
+        }
+        Insert: {
+          blood_type: Database["public"]["Enums"]["blood_type"]
+          id?: string
+          level?: string
+          units?: number
+          updated_at?: string
+        }
+        Update: {
+          blood_type?: Database["public"]["Enums"]["blood_type"]
+          id?: string
+          level?: string
+          units?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       chronic_conditions: {
         Row: {
           condition: string
@@ -1227,6 +1299,16 @@ export type Database = {
         | "cancelled"
         | "no_show"
         | "in_progress"
+      blood_type:
+        | "A+"
+        | "A-"
+        | "B+"
+        | "B-"
+        | "AB+"
+        | "AB-"
+        | "O+"
+        | "O-"
+        | "unknown"
       department_category:
         | "Surgery"
         | "Internal"
@@ -1240,6 +1322,12 @@ export type Database = {
         | "referral"
         | "consent_form"
         | "other"
+      donation_status:
+        | "pending"
+        | "contacted"
+        | "scheduled"
+        | "completed"
+        | "cancelled"
       lab_result_status: "pending" | "completed" | "reviewed"
       news_category:
         | "hospital_news"
@@ -1398,6 +1486,7 @@ export const Constants = {
         "no_show",
         "in_progress",
       ],
+      blood_type: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "unknown"],
       department_category: [
         "Surgery",
         "Internal",
@@ -1412,6 +1501,13 @@ export const Constants = {
         "referral",
         "consent_form",
         "other",
+      ],
+      donation_status: [
+        "pending",
+        "contacted",
+        "scheduled",
+        "completed",
+        "cancelled",
       ],
       lab_result_status: ["pending", "completed", "reviewed"],
       news_category: [
