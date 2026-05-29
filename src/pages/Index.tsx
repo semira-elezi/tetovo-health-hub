@@ -53,7 +53,6 @@ const departments = [
 export default function HomePage() {
   const { t, language } = useTranslation();
   const { data: latestNews } = useNews();
-  const { data: erWaits } = useERWaitTimes();
 
   const s1 = useCountUp(300);
   const s2 = useCountUp(500);
