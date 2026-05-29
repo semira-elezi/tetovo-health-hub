@@ -11,6 +11,7 @@ import { useNews } from "@/hooks/useNews";
 import { useERWaitTimes } from "@/hooks/useERWaitTimes";
 import DoctorAvailabilityWidget from "@/components/features/availability/DoctorAvailabilityWidget";
 import { format } from "date-fns";
+import heroBg from "@/assets/hospital-hero.jpg";
 
 /* ─── Counter ─── */
 function useCountUp(target: number, duration = 1500) {
