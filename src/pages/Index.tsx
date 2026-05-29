@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/lib/i18n";
 import { useNews } from "@/hooks/useNews";
 import { useERWaitTimes } from "@/hooks/useERWaitTimes";
+import DoctorAvailabilityWidget from "@/components/features/availability/DoctorAvailabilityWidget";
 import { format } from "date-fns";
 
 /* ─── Counter ─── */
@@ -197,6 +198,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ══════ DOCTOR AVAILABILITY ══════ */}
+      <DoctorAvailabilityWidget />
 
       {/* ══════ NEWS ══════ */}
       <section className="py-12 md:py-16 bg-muted/40">
