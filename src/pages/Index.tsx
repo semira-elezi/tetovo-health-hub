@@ -81,9 +81,8 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(222_60%_15%)] via-[hsl(222_60%_18%)]/85 to-[hsl(222_60%_22%)]/70" aria-hidden />
 
-        <div className="container relative grid gap-10 py-14 md:py-20 lg:grid-cols-5 lg:gap-12">
-          {/* Left */}
-          <div className="lg:col-span-3 animate-hero">
+        <div className="container relative py-14 md:py-20">
+          <div className="max-w-2xl animate-hero">
             <h1 className="text-3xl font-extrabold leading-[1.1] tracking-tight md:text-5xl lg:text-[3.25rem]">
               {t("hero.title")}
             </h1>
@@ -106,43 +105,6 @@ export default function HomePage() {
                   {language === "mk" ? "Проверка на симптоми" : language === "sq" ? "Symptom Checker" : "Symptom Checker"}
                 </Link>
               </Button>
-            </div>
-          </div>
-
-          {/* Right — ER wait times card (glassmorphic) */}
-          <div className="lg:col-span-2 animate-hero-delay-2">
-            <div className="rounded-2xl border border-white/15 bg-white/[0.07] backdrop-blur-md p-5 shadow-2xl">
-              <div className="flex items-center gap-2 text-sm font-semibold">
-                <Asterisk className="h-4 w-4 text-red-300" />
-                {language === "mk" ? "Време на чекање во Ургенција" : language === "sq" ? "Koha e Pritjes në Urgjencë" : "ER Wait Times"}
-              </div>
-
-              <div className="mt-4 space-y-2.5">
-                {(waitItems.length > 0 ? waitItems : [
-                  { id: "a", department: "Cardiology", department_mk: "Кардиологија", department_sq: "Kardiologji", current_wait_minutes: 15 },
-                  { id: "b", department: "Pediatrics", department_mk: "Педијатрија", department_sq: "Pediatri", current_wait_minutes: 5 },
-                  { id: "c", department: "Orthopedics", department_mk: "Ортопедија", department_sq: "Ortopedi", current_wait_minutes: 45 },
-                ]).map((w: any) => (
-                  <div key={w.id} className="flex items-center justify-between rounded-xl bg-white/[0.06] border border-white/10 px-4 py-3">
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold leading-tight">
-                        {language === "sq" ? (w.department_sq || w.department) : language === "mk" ? (w.department_mk || w.department) : w.department}
-                      </p>
-                      <p className="text-[11px] text-white/55 leading-tight mt-0.5">
-                        {w.department_mk || w.department} / {w.department}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0 ml-3">
-                      <span className={`h-2 w-2 rounded-full ${dotColor(w.current_wait_minutes)}`} />
-                      <span className="text-sm font-semibold tabular-nums">{w.current_wait_minutes} min</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <p className="mt-3 text-[11px] italic text-white/45">
-                * {language === "mk" ? "Времињата се приближни и се ажурираат на секои 5 минути." : language === "sq" ? "Kohët e pritjes janë të përafërta dhe përditësohen çdo 5 minuta." : "Wait times are approximate and updated every 5 minutes."}
-              </p>
             </div>
           </div>
         </div>
