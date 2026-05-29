@@ -49,11 +49,6 @@ const departments = [
     mk: "Хирургија", en: "Surgery" },
 ];
 
-function dotColor(mins: number) {
-  if (mins <= 15) return "bg-emerald-400";
-  if (mins <= 30) return "bg-yellow-400";
-  return "bg-orange-400";
-}
 
 export default function HomePage() {
   const { t, language } = useTranslation();
