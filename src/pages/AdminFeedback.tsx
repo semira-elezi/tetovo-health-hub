@@ -62,6 +62,9 @@ export default function AdminFeedback() {
   const avgRating = feedback?.length ? (feedback.reduce((s, f) => s + f.rating, 0) / feedback.length).toFixed(1) : "0";
   const pendingCount = feedback?.filter(f => f.status === "pending").length || 0;
 
+  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
+  if (!user || !isAdmin) return <Navigate to="/auth/login" replace />;
+
   return (
     <Layout>
       <div className="container py-10">

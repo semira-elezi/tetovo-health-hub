@@ -89,6 +89,9 @@ export default function AdminDocuments() {
 
   const filtered = documents?.filter(d => d.category === tab) || [];
 
+  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
+  if (!user || !isAdmin) return <Navigate to="/auth/login" replace />;
+
   return (
     <Layout>
       <div className="container py-10">

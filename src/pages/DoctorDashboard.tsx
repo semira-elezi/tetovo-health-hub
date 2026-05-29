@@ -144,6 +144,9 @@ export default function DoctorDashboard() {
     </Button>
   );
 
+  if (authLoading) return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Loading...</div>;
+  if (!user || !isDoctor) return <Navigate to="/auth/login" replace />;
+
   return (
     <PortalShell
       role="doctor"

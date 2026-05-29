@@ -120,6 +120,9 @@ export default function AdminAnalytics() {
     { icon: Clock, value: pendingCount, label: "Pending Appointments", borderColor: "border-l-amber-500" },
   ];
 
+  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
+  if (!user || !isAdmin) return <Navigate to="/auth/login" replace />;
+
   return (
     <Layout>
       <div className="container py-10">
