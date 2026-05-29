@@ -177,6 +177,45 @@ export type Database = {
         }
         Relationships: []
       }
+      blood_demand_campaigns: {
+        Row: {
+          blood_type: Database["public"]["Enums"]["blood_type"]
+          contacted_count: number
+          created_at: string
+          created_by: string | null
+          id: string
+          message: string | null
+          status: string
+          units_needed: number
+          updated_at: string
+          urgency: string
+        }
+        Insert: {
+          blood_type: Database["public"]["Enums"]["blood_type"]
+          contacted_count?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message?: string | null
+          status?: string
+          units_needed?: number
+          updated_at?: string
+          urgency?: string
+        }
+        Update: {
+          blood_type?: Database["public"]["Enums"]["blood_type"]
+          contacted_count?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message?: string | null
+          status?: string
+          units_needed?: number
+          updated_at?: string
+          urgency?: string
+        }
+        Relationships: []
+      }
       blood_donation_requests: {
         Row: {
           blood_type: Database["public"]["Enums"]["blood_type"]
@@ -1072,6 +1111,7 @@ export type Database = {
         Row: {
           address: string | null
           avatar_url: string | null
+          blood_type: Database["public"]["Enums"]["blood_type"] | null
           created_at: string
           date_of_birth: string | null
           full_name: string | null
@@ -1083,6 +1123,7 @@ export type Database = {
         Insert: {
           address?: string | null
           avatar_url?: string | null
+          blood_type?: Database["public"]["Enums"]["blood_type"] | null
           created_at?: string
           date_of_birth?: string | null
           full_name?: string | null
@@ -1094,6 +1135,7 @@ export type Database = {
         Update: {
           address?: string | null
           avatar_url?: string | null
+          blood_type?: Database["public"]["Enums"]["blood_type"] | null
           created_at?: string
           date_of_birth?: string | null
           full_name?: string | null

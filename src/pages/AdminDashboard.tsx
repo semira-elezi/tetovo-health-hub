@@ -259,8 +259,12 @@ export default function AdminDashboard() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
         <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search analytics..." className="pl-9 h-10 w-64 rounded-lg" />
       </div>
+      <Button asChild variant="outline" className="gap-2">
+        <a href="/admin/blood-donation"><span className="text-red-500">●</span> Blood Donation</a>
+      </Button>
     </div>
   );
+
 
   return (
     <PortalShell
