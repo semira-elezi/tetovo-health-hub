@@ -41,12 +41,12 @@ export default function DoctorDashboard() {
   const isDoctor = roles.includes("doctor") || roles.includes("admin");
 
   const { data: doctorRecord } = useQuery({
-    queryKey: ["doctor-record", user.id],
+    queryKey: ["doctor-record", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("doctors").select("*, departments(name_en)").eq("user_id", user.id).single();
+      const { data, error } = await supabase.from("doctors").select("*, departments(name_en)").eq("user_id", user!.id).single();
       if (error) return null; return data;
     },
-    enabled: !!user.id,
+    enabled: !!user?.id,
   });
 
   const { data: appointments, isLoading: aptsLoading } = useQuery({
