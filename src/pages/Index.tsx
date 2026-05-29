@@ -118,9 +118,9 @@ export default function HomePage() {
 
               <div className="mt-4 space-y-2.5">
                 {(waitItems.length > 0 ? waitItems : [
-                  { id: "a", department: "Cardiology", department_mk: "Кардиологија", department_sq: "Kardiologji", wait_minutes: 15 },
-                  { id: "b", department: "Pediatrics", department_mk: "Педијатрија", department_sq: "Pediatri", wait_minutes: 5 },
-                  { id: "c", department: "Orthopedics", department_mk: "Ортопедија", department_sq: "Ortopedi", wait_minutes: 45 },
+                  { id: "a", department: "Cardiology", department_mk: "Кардиологија", department_sq: "Kardiologji", current_wait_minutes: 15 },
+                  { id: "b", department: "Pediatrics", department_mk: "Педијатрија", department_sq: "Pediatri", current_wait_minutes: 5 },
+                  { id: "c", department: "Orthopedics", department_mk: "Ортопедија", department_sq: "Ortopedi", current_wait_minutes: 45 },
                 ]).map((w: any) => (
                   <div key={w.id} className="flex items-center justify-between rounded-xl bg-white/[0.06] border border-white/10 px-4 py-3">
                     <div className="min-w-0">
@@ -132,8 +132,8 @@ export default function HomePage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0 ml-3">
-                      <span className={`h-2 w-2 rounded-full ${dotColor(w.wait_minutes)}`} />
-                      <span className="text-sm font-semibold tabular-nums">{w.wait_minutes} min</span>
+                      <span className={`h-2 w-2 rounded-full ${dotColor(w.current_wait_minutes)}`} />
+                      <span className="text-sm font-semibold tabular-nums">{w.current_wait_minutes} min</span>
                     </div>
                   </div>
                 ))}

@@ -31,8 +31,7 @@ export default function AdminAppointments() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
 
-  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
-  if (!user || !isAdmin) return <Navigate to="/auth/login" replace />;
+  const allowed = !!user && isAdmin;
 
   const { data: departments } = useQuery({
     queryKey: ["departments"],
@@ -103,6 +102,9 @@ export default function AdminAppointments() {
     }
     return actions;
   };
+
+  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
+  if (!allowed) return <Navigate to="/auth/login" replace />;
 
   return (
     <Layout>
