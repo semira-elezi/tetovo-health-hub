@@ -39,16 +39,14 @@ export default function DoctorDashboard() {
   const [filter, setFilter] = useState("today");
 
   const isDoctor = roles.includes("doctor") || roles.includes("admin");
-  if (authLoading) return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Loading...</div>;
-  if (!user || !isDoctor) return <Navigate to="/auth/login" replace />;
 
   const { data: doctorRecord } = useQuery({
-    queryKey: ["doctor-record", user.id],
+    queryKey: ["doctor-record", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("doctors").select("*, departments(name_en)").eq("user_id", user.id).single();
+      const { data, error } = await supabase.from("doctors").select("*, departments(name_en)").eq("user_id", user!.id).single();
       if (error) return null; return data;
     },
-    enabled: !!user.id,
+    enabled: !!user?.id,
   });
 
   const { data: appointments, isLoading: aptsLoading } = useQuery({
@@ -145,6 +143,9 @@ export default function DoctorDashboard() {
       </Link>
     </Button>
   );
+
+  if (authLoading) return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Loading...</div>;
+  if (!user || !isDoctor) return <Navigate to="/auth/login" replace />;
 
   return (
     <PortalShell

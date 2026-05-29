@@ -30,20 +30,18 @@ export default function PatientAppointments() {
   const [feedbackApt, setFeedbackApt] = useState<any>(null);
   const [cancelReason, setCancelReason] = useState("");
 
-  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
-  if (!user) return <Navigate to="/auth/login" replace />;
-
   const { data: appointments, isLoading } = useQuery({
-    queryKey: ["patient-appointments", user.id],
+    queryKey: ["patient-appointments", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("appointments")
         .select("*, doctors(full_name, title, image_url), departments(name_en)")
-        .eq("patient_id", user.id)
+        .eq("patient_id", user!.id)
         .order("appointment_date", { ascending: false });
       if (error) throw error;
       return data;
     },
+    enabled: !!user,
   });
 
   const cancelMut = useMutation({
@@ -80,6 +78,11 @@ export default function PatientAppointments() {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     return !isAfter(today, parseISO(a.appointment_date));
   };
+
+  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
+  if (!user) return <Navigate to="/auth/login" replace />;
+
+
 
   return (
     <Layout>

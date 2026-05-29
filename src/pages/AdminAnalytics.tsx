@@ -27,8 +27,6 @@ export default function AdminAnalytics() {
   const { user, isAdmin, isLoading: authLoading } = useAuth();
   const [range, setRange] = useState<DateRange>("month");
 
-  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
-  if (!user || !isAdmin) return <Navigate to="/auth/login" replace />;
 
   const getStartDate = () => {
     const now = new Date();
@@ -121,6 +119,9 @@ export default function AdminAnalytics() {
     { icon: Stethoscope, value: doctorsCount || 0, label: "Doctors Available", borderColor: "border-l-green-500" },
     { icon: Clock, value: pendingCount, label: "Pending Appointments", borderColor: "border-l-amber-500" },
   ];
+
+  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
+  if (!user || !isAdmin) return <Navigate to="/auth/login" replace />;
 
   return (
     <Layout>

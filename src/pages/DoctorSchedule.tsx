@@ -26,15 +26,14 @@ export default function DoctorSchedule() {
   const [bulkOpen, setBulkOpen] = useState(false);
 
   const isDoctor = roles.includes("doctor") || roles.includes("admin");
-  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
-  if (!user || !isDoctor) return <Navigate to="/auth/login" replace />;
 
   const { data: doctorRecord } = useQuery({
-    queryKey: ["doctor-record", user.id],
+    queryKey: ["doctor-record", user?.id],
     queryFn: async () => {
-      const { data } = await supabase.from("doctors").select("id").eq("user_id", user.id).single();
+      const { data } = await supabase.from("doctors").select("id").eq("user_id", user!.id).single();
       return data;
     },
+    enabled: !!user,
   });
 
   const weekStart = startOfWeek(addWeeks(new Date(), weekOffset), { weekStartsOn: 1 });
@@ -92,6 +91,11 @@ export default function DoctorSchedule() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["doctor-slots"] }); toast.success("Week cleared"); },
     onError: () => toast.error("Failed to clear week"),
   });
+
+  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
+  if (!user || !isDoctor) return <Navigate to="/auth/login" replace />;
+
+
 
   return (
     <Layout>

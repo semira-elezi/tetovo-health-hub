@@ -41,8 +41,6 @@ export default function AdminDocuments() {
     title: "", category: "documents", file_url: "", description: "", published_at: new Date().toISOString(),
   });
 
-  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
-  if (!user || !isAdmin) return <Navigate to="/auth/login" replace />;
 
   const { data: documents, isLoading } = useQuery({
     queryKey: ["admin-procurement-docs"],
@@ -90,6 +88,9 @@ export default function AdminDocuments() {
   };
 
   const filtered = documents?.filter(d => d.category === tab) || [];
+
+  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
+  if (!user || !isAdmin) return <Navigate to="/auth/login" replace />;
 
   return (
     <Layout>
