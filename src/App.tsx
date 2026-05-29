@@ -22,6 +22,7 @@ import AdminAnalytics from "./pages/AdminAnalytics";
 import AdminAppointments from "./pages/AdminAppointments";
 import AdminFeedback from "./pages/AdminFeedback";
 import AdminDocuments from "./pages/AdminDocuments";
+import AdminBloodDonation from "./pages/AdminBloodDonation";
 import DoctorSchedule from "./pages/DoctorSchedule";
 import PatientAppointments from "./pages/PatientAppointments";
 import SymptomChecker from "./pages/SymptomChecker";
@@ -66,6 +67,7 @@ const App = () => (
                 <Route path="/admin/appointments" element={<AdminAppointments />} />
                 <Route path="/admin/feedback" element={<AdminFeedback />} />
                 <Route path="/admin/documents" element={<AdminDocuments />} />
+                <Route path="/admin/blood-donation" element={<AdminBloodDonation />} />
                 <Route path="/doctor/schedule" element={<DoctorSchedule />} />
                 <Route path="/patient/appointments" element={<PatientAppointments />} />
                 <Route path="*" element={<NotFound />} />
