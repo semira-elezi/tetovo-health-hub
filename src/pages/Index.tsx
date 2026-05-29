@@ -74,8 +74,8 @@ export default function HomePage() {
       {/* ══════ HERO ══════ */}
       <section className="relative overflow-hidden bg-[hsl(222_60%_18%)] text-white">
         <div
-          className="absolute inset-0 opacity-30 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1600&q=80')" }}
+          className="absolute inset-0 opacity-40 bg-cover bg-center"
+          style={{ backgroundImage: `url(${heroBg})` }}
           aria-hidden
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(222_60%_15%)] via-[hsl(222_60%_18%)]/85 to-[hsl(222_60%_22%)]/70" aria-hidden />
