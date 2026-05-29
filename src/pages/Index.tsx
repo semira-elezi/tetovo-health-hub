@@ -61,8 +61,6 @@ export default function HomePage() {
   const featured = (latestNews || [])[0];
   const sideNews = (latestNews || []).slice(1, 3);
 
-  const waitItems = (erWaits || []).slice(0, 3);
-
   return (
     <Layout>
       {/* ══════ HERO ══════ */}
