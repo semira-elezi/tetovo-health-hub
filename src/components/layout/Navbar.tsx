@@ -92,10 +92,11 @@ export default function Navbar() {
     { to: "/contact", label: t("nav.contact") },
     { to: "/faq", label: language === "mk" ? "ЧПП" : language === "sq" ? "FAQ" : "FAQ" },
     { to: "/working-hours", label: language === "mk" ? "Работно време" : language === "sq" ? "Orari" : "Hours" },
+    { to: "/blood-donation", label: language === "mk" ? "Дарување крв" : language === "sq" ? "Dhurim Gjaku" : "Blood Donation" },
   ];
 
   const isServicesActive = ["/departments", "/appointments", "/symptom-checker"].some((p) => location.pathname.startsWith(p));
-  const isResourcesActive = ["/news", "/public-info", "/contact", "/faq", "/working-hours"].some((p) => location.pathname.startsWith(p));
+  const isResourcesActive = ["/news", "/public-info", "/contact", "/faq", "/working-hours", "/blood-donation"].some((p) => location.pathname.startsWith(p));
 
   return (
     <>

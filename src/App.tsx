@@ -30,6 +30,7 @@ import PublicInfo from "./pages/PublicInfo";
 import FAQ from "./pages/FAQ";
 import WorkingHours from "./pages/WorkingHours";
 import Terms from "./pages/Terms";
+import BloodDonation from "./pages/BloodDonation";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ const App = () => (
                 <Route path="/auth/register" element={<Register />} />
                 <Route path="/portal" element={<Portal />} />
                 <Route path="/public-info" element={<PublicInfo />} />
+                <Route path="/blood-donation" element={<BloodDonation />} />
                 <Route path="/symptom-checker" element={<SymptomChecker />} />
                 <Route path="/appointments" element={<Appointments />} />
                 <Route path="/admin/analytics" element={<AdminAnalytics />} />
