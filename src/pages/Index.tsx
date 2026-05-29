@@ -1,14 +1,13 @@
 import { Link } from "react-router-dom";
 import {
-  Heart, AlertTriangle, Scissors, Brain, Baby, Users,
-  ArrowRight, Calendar, Stethoscope, Asterisk, Phone, Mail,
+  Heart, Scissors, Brain, Baby,
+  ArrowRight, Calendar, Stethoscope, Phone, Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/lib/i18n";
 import { useNews } from "@/hooks/useNews";
-import { useERWaitTimes } from "@/hooks/useERWaitTimes";
 import DoctorAvailabilityWidget from "@/components/features/availability/DoctorAvailabilityWidget";
 import { format } from "date-fns";
 import heroBg from "@/assets/hospital-hero.jpg";
