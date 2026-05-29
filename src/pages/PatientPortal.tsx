@@ -91,6 +91,7 @@ export default function PatientPortal() {
     const { error } = await supabase.from("profiles").update({
       full_name: profileForm.full_name, phone: profileForm.phone,
       date_of_birth: profileForm.date_of_birth || null, gender: profileForm.gender || null, address: profileForm.address || null,
+      blood_type: profileForm.blood_type || null,
     }).eq("id", user.id);
     if (error) toast.error("Failed to save"); else toast.success(t("portal.save") + " ✓");
   };
@@ -379,6 +380,18 @@ export default function PatientPortal() {
             <div className="space-y-2"><label className="text-sm font-medium">{t("auth.dob") || "Date of Birth"}</label><Input type="date" value={profileForm.date_of_birth} onChange={e => setProfileForm((f: any) => ({ ...f, date_of_birth: e.target.value }))} /></div>
             <div className="space-y-2"><label className="text-sm font-medium">{t("portal.gender") || "Gender"}</label><Input value={profileForm.gender} onChange={e => setProfileForm((f: any) => ({ ...f, gender: e.target.value }))} placeholder="M/F" /></div>
             <div className="space-y-2"><label className="text-sm font-medium">{t("portal.addressLabel") || "Address"}</label><Input value={profileForm.address} onChange={e => setProfileForm((f: any) => ({ ...f, address: e.target.value }))} /></div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Blood Type</label>
+              <select
+                value={profileForm.blood_type || ""}
+                onChange={e => setProfileForm((f: any) => ({ ...f, blood_type: e.target.value }))}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Unknown / prefer not to say</option>
+                {["A+","A-","B+","B-","AB+","AB-","O+","O-"].map(b => <option key={b} value={b}>{b}</option>)}
+              </select>
+              <p className="text-xs text-muted-foreground">Helps the hospital notify you when your blood type is urgently needed.</p>
+            </div>
             <Button onClick={handleSaveProfile}>{t("portal.save") || "Save"}</Button>
           </CardContent>
         </Card>
