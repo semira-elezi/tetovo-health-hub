@@ -54,18 +54,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const loadUserData = async (userId: string) => {
-      await Promise.all([fetchProfile(userId), fetchRoles(userId)]);
+    const loadUserData = (userId: string) => {
+      Promise.all([fetchProfile(userId), fetchRoles(userId)]).finally(() => {
+        setIsLoading(false);
+      });
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
           setIsLoading(true);
-          await loadUserData(session.user.id);
-          setIsLoading(false);
+          // Defer Supabase calls to avoid deadlocking the auth listener
+          setTimeout(() => loadUserData(session.user.id), 0);
         } else {
           setProfile(null);
           setRoles([]);
@@ -74,13 +76,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        await loadUserData(session.user.id);
+        loadUserData(session.user.id);
+      } else {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
