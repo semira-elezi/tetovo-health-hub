@@ -27,8 +27,6 @@ export default function AdminAnalytics() {
   const { user, isAdmin, isLoading: authLoading } = useAuth();
   const [range, setRange] = useState<DateRange>("month");
 
-  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
-  if (!user || !isAdmin) return <Navigate to="/auth/login" replace />;
 
   const getStartDate = () => {
     const now = new Date();

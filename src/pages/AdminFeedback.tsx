@@ -22,8 +22,6 @@ export default function AdminFeedback() {
   const [respondTo, setRespondTo] = useState<any>(null);
   const [response, setResponse] = useState("");
 
-  if (authLoading) return <Layout><div className="container py-20 text-center text-muted-foreground">Loading...</div></Layout>;
-  if (!user || !isAdmin) return <Navigate to="/auth/login" replace />;
 
   const { data: feedback, isLoading } = useQuery({
     queryKey: ["admin-feedback"],

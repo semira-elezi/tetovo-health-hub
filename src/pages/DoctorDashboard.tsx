@@ -39,8 +39,6 @@ export default function DoctorDashboard() {
   const [filter, setFilter] = useState("today");
 
   const isDoctor = roles.includes("doctor") || roles.includes("admin");
-  if (authLoading) return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Loading...</div>;
-  if (!user || !isDoctor) return <Navigate to="/auth/login" replace />;
 
   const { data: doctorRecord } = useQuery({
     queryKey: ["doctor-record", user.id],
